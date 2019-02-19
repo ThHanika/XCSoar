@@ -97,9 +97,9 @@ zlib = ZlibProject(
 )
 
 freetype = FreeTypeProject(
-    'http://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.bz2',
-    'http://downloads.sourceforge.net/project/freetype/freetype2/2.8.1/freetype-2.8.1.tar.bz2',
-    'e5435f02e02d2b87bb8e4efdcaa14b1f78c9cf3ab1ed80f94b6382fb6acc7d78',
+    'http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2',
+    'http://downloads.sourceforge.net/project/freetype/freetype2/2.9.1/freetype-2.9.1.tar.bz2',
+    'db8d87ea720ea9d5edc5388fc7a0497bb11ba9fe972245e0f7f4c7e8b1e1e84d',
     'lib/libfreetype.a',
     [
         '--disable-shared', '--enable-static',
@@ -109,9 +109,9 @@ freetype = FreeTypeProject(
 )
 
 curl = CurlProject(
-    'http://curl.haxx.se/download/curl-7.61.0.tar.xz',
-    'https://github.com/curl/curl/releases/download/curl-7_61_0/curl-7.61.0.tar.xz',
-    'ef6e55192d04713673b4409ccbcb4cb6cd723137d6e10ca45b0c593a454e1720',
+    'http://curl.haxx.se/download/curl-7.63.0.tar.xz',
+    'https://github.com/curl/curl/releases/download/curl-7_63_0/curl-7.63.0.tar.xz',
+    '9600234c794bfb8a0d3f138e9294d60a20e7a5f10e35ece8cf518e2112d968c4',
     'lib/libcurl.a',
     [
         '--disable-shared', '--enable-static',
@@ -146,9 +146,9 @@ proj = AutotoolsProject(
 )
 
 libpng = LibPNGProject(
-    'ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.34.tar.xz',
-    'http://downloads.sourceforge.net/project/libpng/libpng16/1.6.34/libpng-1.6.34.tar.xz',
-    '2f1e960d92ce3b3abd03d06dfec9637dfbd22febf107a536b44f7a47c60659f6',
+    'ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.36.tar.xz',
+    'http://downloads.sourceforge.net/project/libpng/libpng16/1.6.36/libpng-1.6.36.tar.xz',
+    'eceb924c1fa6b79172fdfd008d335f0e59172a86a66481e09d4089df872aa319',
     'lib/libpng.a',
     [
         '--disable-shared', '--enable-static',
@@ -185,9 +185,9 @@ simple_usbmodeswitch = AutotoolsProject(
 )
 
 libtiff = AutotoolsProject(
-    'http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz',
-    'http://ftp.lfs-matrix.net/pub/blfs/conglomeration/tiff/tiff-4.0.9.tar.gz',
-    '6e7bdeec2c310734e734d19aae3a71ebe37a4d842e0e23dbb1b8921c0026cfcd',
+    'http://download.osgeo.org/libtiff/tiff-4.0.10.tar.gz',
+    'http://ftp.lfs-matrix.net/pub/blfs/conglomeration/tiff/tiff-4.0.10.tar.gz',
+    '2c52d11ccaf767457db0c46795d9c7d1a8d8f76f68b0b800a3dfe45786b996e4',
     'lib/libtiff.a',
     [
         '--disable-shared', '--enable-static',

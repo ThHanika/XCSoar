@@ -20,3 +20,10 @@ Copyright_License {
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
 */
+
+#ifndef XCSOAR_DEVICE_DRIVER_AIRCONTROLDISPLAY_HPP
+#define XCSOAR_DEVICE_DRIVER_AIRCONTROLDISPLAY_HPP
+
+extern const struct DeviceRegister acd_driver;
+
+#endif

@@ -9,6 +9,7 @@ Version 7.0 - not yet released
   - parse wind from standard NMEA sentence WMV
   - driver for XC Tracer Vario
   - driver for KRT2 radio
+  - driver for Air Control Display altimeter
   - show detailed error message in device list
   - FLARM/OGN - make it possible to set/download registered device database
   - device manager: show flag if device provides data from
@@ -63,6 +64,9 @@ Version 7.0 - not yet released
 Version 6.8.12 - not yet released
 * Android
   - increase targetSdkVersion to 26 (required by Google Play)
+* Task Editor
+  - fixed task editor crashes (Ticket 3930).
+* fix IGC logger crash when no date is available
 
 Version 6.8.11 - 2018/08/18
 * terrain

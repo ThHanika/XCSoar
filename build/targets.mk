@@ -324,7 +324,7 @@ ifeq ($(TARGET),UNIX)
 endif
 
 ifeq ($(TARGET),ANDROID)
-  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r18-beta2
+  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r19
 
   ANDROID_SDK_PLATFORM = android-22
   ANDROID_NDK_PLATFORM = android-21
@@ -647,6 +647,13 @@ ifeq ($(TARGET),ANDROID)
     # workaround for "... uses VFP register arguments, output does not"
     TARGET_LDFLAGS += -Wl,--no-warn-mismatch
   endif
+
+  # clang as linker driver adds the option '-pie' to the linker command for the X64 platform.
+  # This option which is incompatible with the option '-shared'.
+  ifeq ($(X64),y)
+    TARGET_LDFLAGS += -no-pie
+  endif
+
 endif
 
 ifeq ($(HAVE_WIN32),y)
