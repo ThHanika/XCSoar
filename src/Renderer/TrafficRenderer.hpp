@@ -30,6 +30,7 @@ struct PixelPoint;
 class Canvas;
 struct TrafficLook;
 struct FlarmTraffic;
+struct GliderLinkTraffic;
 class Angle;
 
 namespace TrafficRenderer
@@ -38,6 +39,10 @@ void
 Draw(Canvas &canvas, const TrafficLook &traffic_look,
      const FlarmTraffic &traffic, Angle angle,
      FlarmColor color, PixelPoint pt);
+
+void
+Draw(Canvas &canvas, const TrafficLook &traffic_look,
+     const GliderLinkTraffic &traffic, Angle angle, PixelPoint pt);
 }
 
 #endif

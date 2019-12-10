@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "ActionInterface.hpp"
 #include "Interface.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "MainWindow.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Language/Language.hpp"
@@ -47,7 +47,7 @@ void
 XCSoarInterface::ReceiveGPS()
 {
   {
-    ScopeLock protect(device_blackboard->mutex);
+    std::lock_guard<Mutex> lock(device_blackboard->mutex);
 
     ReadBlackboardBasic(device_blackboard->Basic());
 
@@ -67,7 +67,7 @@ void
 XCSoarInterface::ReceiveCalculated()
 {
   {
-    ScopeLock protect(device_blackboard->mutex);
+    std::lock_guard<Mutex> lock(device_blackboard->mutex);
 
     ReadBlackboardCalculated(device_blackboard->Calculated());
     device_blackboard->ReadComputerSettings(GetComputerSettings());
@@ -87,7 +87,7 @@ XCSoarInterface::ExchangeBlackboard()
 void
 XCSoarInterface::ExchangeDeviceBlackboard()
 {
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
 
   device_blackboard->ReadComputerSettings(GetComputerSettings());
 }
@@ -290,4 +290,76 @@ ActionInterface::SendUIState()
   InfoBoxManager::ProcessTimer();
 
   main_window->SetUIState(GetUIState());
+}
+
+void
+ActionInterface::SetActiveFrequency(const RadioFrequency & freq, const TCHAR * freq_name, bool to_devices)
+{
+  /* update interface settings */
+
+  SetComputerSettings().radio.active_frequency = freq;
+  if(freq_name != nullptr) {
+    SetComputerSettings().radio.active_name = freq_name;
+  }
+  else {
+    SetComputerSettings().radio.active_name.clear();
+  }
+
+  /* update InfoBoxes (that might show the ActiveFrequency setting) */
+
+  InfoBoxManager::SetDirty();
+
+  /* send to external devices */
+
+  if (to_devices) {
+    MessageOperationEnvironment env;
+    device_blackboard->SetActiveFrequency(freq, freq_name, env);
+  }
+}
+
+void
+ActionInterface::SetStandbyFrequency(const RadioFrequency & freq, const TCHAR * freq_name, bool to_devices)
+{
+  /* update interface settings */
+
+  SetComputerSettings().radio.standby_frequency = freq;
+  if(freq_name != nullptr) {
+    SetComputerSettings().radio.standby_name = freq_name;
+  }
+  else {
+    SetComputerSettings().radio.standby_name.clear();
+  }
+
+  /* update InfoBoxes (that might show the ActiveFrequency setting) */
+
+  InfoBoxManager::SetDirty();
+
+  /* send to external devices */
+
+  if (to_devices) {
+    MessageOperationEnvironment env;
+    device_blackboard->SetStandbyFrequency(freq, freq_name, env);
+  }
+}
+
+void ActionInterface::OffsetActiveFrequency(double offset_khz, bool to_devices)
+{
+  RadioFrequency new_active_freq = SetComputerSettings().radio.active_frequency;
+  if(new_active_freq.IsDefined()) {
+    new_active_freq.SetKiloHertz(new_active_freq.GetKiloHertz() + offset_khz);
+    if(new_active_freq.IsDefined()) {
+      ActionInterface::SetActiveFrequency(new_active_freq, nullptr, to_devices);
+    }
+  }
+}
+
+void ActionInterface::OffsetStandbyFrequency(double offset_khz, bool to_devices)
+{
+  RadioFrequency new_standby_freq = SetComputerSettings().radio.standby_frequency;
+  if(new_standby_freq.IsDefined()) {
+    new_standby_freq.SetKiloHertz(new_standby_freq.GetKiloHertz() + offset_khz);
+    if(new_standby_freq.IsDefined()) {
+      ActionInterface::SetStandbyFrequency(new_standby_freq, nullptr, to_devices);
+    }
+  }
 }

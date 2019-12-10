@@ -34,6 +34,7 @@ Copyright_License {
 #include "Util/PrintException.hxx"
 #include "Math/Util.hpp"
 #include "Time/PeriodClock.hpp"
+#include "Time/Cast.hxx"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,11 +66,10 @@ try {
   double pressure = 101300;
   unsigned battery_level = 11;
   while (true) {
-    if (pressure_clock.CheckUpdate(48)) {
+    if (pressure_clock.CheckUpdate(std::chrono::milliseconds(48))) {
       NarrowString<16> sentence;
 
-      int elapsed_ms = start_clock.Elapsed();
-      auto elapsed = elapsed_ms / 1000.;
+      const auto elapsed = ToFloatSeconds(start_clock.Elapsed());
       auto vario = sin(elapsed / 3) * cos(elapsed / 10) *
         cos(elapsed / 20 + 2) * 3;
 
@@ -84,7 +84,7 @@ try {
       port->Write(sentence.c_str(), sentence.length());
     }
 
-    if (battery_clock.CheckUpdate(11000)) {
+    if (battery_clock.CheckUpdate(std::chrono::seconds(11))) {
       NarrowString<16> sentence;
 
       sentence = "_BAT ";

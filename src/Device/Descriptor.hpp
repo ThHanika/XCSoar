@@ -35,16 +35,19 @@ Copyright_License {
 #include "Time/PeriodClock.hpp"
 #include "Job/Async.hpp"
 #include "Event/Notify.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Thread/Debug.hpp"
 #include "Util/tstring.hpp"
 #include "Util/StaticFifoBuffer.hxx"
+#include "Android/GliderLink.hpp"
+
+#include <chrono>
 
 #include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
 
-namespace boost { namespace asio { class io_service; }}
+namespace boost { namespace asio { class io_context; }}
 
 struct NMEAInfo;
 struct MoreData;
@@ -69,9 +72,9 @@ class OpenDeviceJob;
 
 class DeviceDescriptor final : Notify, PortListener, PortLineSplitter {
   /**
-   * The io_service instance used by Port instances.
+   * The io_context instance used by Port instances.
    */
-  boost::asio::io_service &io_service;
+  boost::asio::io_context &io_context;
 
   /**
    * This mutex protects modifications of the attribute "device".  If
@@ -162,6 +165,7 @@ class DeviceDescriptor final : Notify, PortListener, PortLineSplitter {
   I2CbaroDevice *i2cbaro[3]; // static, pitot, tek; in any order
   NunchuckDevice *nunchuck;
   VoltageDevice *voltage;
+  GliderLink *glider_link;
 #endif
 
   /**
@@ -230,7 +234,7 @@ class DeviceDescriptor final : Notify, PortListener, PortLineSplitter {
   bool borrowed;
 
 public:
-  DeviceDescriptor(boost::asio::io_service &_io_service,
+  DeviceDescriptor(boost::asio::io_context &_io_context,
                    unsigned index, PortListener *port_listener);
   ~DeviceDescriptor() {
     assert(!IsOccupied());
@@ -255,7 +259,7 @@ public:
   PortState GetState() const;
 
   tstring GetErrorMessage() const {
-    const ScopeLock protect(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     return error_message;
   }
 
@@ -280,7 +284,7 @@ public:
   /**
    * @see DumpPort::EnableTemporarily()
    */
-  void EnableDumpTemporarily(unsigned duration_ms);
+  void EnableDumpTemporarily(std::chrono::steady_clock::duration duration) noexcept;
 
   /**
    * Wrapper for Driver::HasTimeout().  This method can't be inline
@@ -336,11 +340,13 @@ private:
   bool OpenNunchuck();
 
   bool OpenVoltage();
+
+  bool OpenGliderLink();
 public:
   /**
    * To be used by OpenDeviceJob, don't call directly.
    */
-  bool DoOpen(OperationEnvironment &env);
+  bool DoOpen(OperationEnvironment &env) noexcept;
 
   void ResetFailureCounter() {
     n_failures = 0u;

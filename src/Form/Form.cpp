@@ -50,7 +50,7 @@ Copyright_License {
 #elif defined(USE_POLL_EVENT)
 #include "Event/Shared/Event.hpp"
 #include "Event/Poll/Loop.hpp"
-#elif defined(WIN32)
+#elif defined(_WIN32)
 #include "Event/Windows/Event.hpp"
 #include "Event/Windows/Loop.hpp"
 #endif
@@ -252,7 +252,7 @@ WndForm::OnCancelMode()
   }
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 bool
 WndForm::OnCommand(unsigned id, unsigned code)
@@ -344,7 +344,7 @@ WndForm::ShowModal()
     // hack to stop exiting immediately
     if (IsEmbedded() && !hastimed &&
         event.IsUserInput()) {
-      if (!enter_clock.Check(200))
+      if (!enter_clock.Check(std::chrono::milliseconds(200)))
         /* ignore user input in the first 200ms */
         continue;
       else
@@ -548,7 +548,7 @@ WndForm::SetCaption(const TCHAR *_caption)
   if (_caption == nullptr)
     _caption = _T("");
 
-  if (!caption.equals(_caption)) {
+  if (caption != _caption) {
     caption = _caption;
     UpdateLayout();
     client_area.Move(client_rect);

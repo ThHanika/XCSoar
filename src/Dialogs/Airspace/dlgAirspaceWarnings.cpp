@@ -41,7 +41,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Widget/ListWidget.hpp"
 #include "UIGlobals.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Audio/Sound.hpp"
 
 #include <assert.h>
@@ -144,7 +144,7 @@ public:
 
 private:
   /* virtual methods from class ActionListener */
-  virtual void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 
   /* virtual methods from Timer */
   virtual void OnTimer() override;
@@ -221,7 +221,7 @@ AirspaceWarningListWidget::Show(const PixelRect &rc)
   sound_interval_counter = 0;
   ListWidget::Show(rc);
   UpdateList();
-  Timer::Schedule(500);
+  Timer::Schedule(std::chrono::milliseconds(500));
 }
 
 void
@@ -448,7 +448,7 @@ AirspaceWarningListWidget::CopyList()
 }
 
 void
-AirspaceWarningListWidget::OnAction(int id)
+AirspaceWarningListWidget::OnAction(int id) noexcept
 {
   switch (id) {
   case ACK:

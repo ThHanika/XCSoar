@@ -7,6 +7,7 @@ endif
 DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Inflate.cpp \
 	$(SRC)/Dialogs/Message.cpp \
+	$(SRC)/Dialogs/LockScreen.cpp \
 	$(SRC)/Dialogs/Error.cpp \
 	$(SRC)/Dialogs/ListPicker.cpp \
 	$(SRC)/Dialogs/ProgressDialog.cpp \
@@ -290,6 +291,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Logger/GlueFlightLogger.cpp \
 	$(SRC)/NMEA/Info.cpp \
 	$(SRC)/NMEA/MoreData.cpp \
+	$(SRC)/NMEA/GPSState.cpp \
 	$(SRC)/NMEA/Acceleration.cpp \
 	$(SRC)/NMEA/Attitude.cpp \
 	$(SRC)/NMEA/ExternalSettings.cpp \
@@ -386,6 +388,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Content/Trace.cpp \
 	$(SRC)/InfoBoxes/Content/Weather.cpp \
 	$(SRC)/InfoBoxes/Content/Airspace.cpp \
+	$(SRC)/InfoBoxes/Content/Radio.cpp \
 	$(SRC)/InfoBoxes/Data.cpp \
 	$(SRC)/InfoBoxes/Format.cpp \
 	$(SRC)/InfoBoxes/Units.cpp \
@@ -400,6 +403,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Panel/MacCreadySetup.cpp \
 	$(SRC)/InfoBoxes/Panel/WindEdit.cpp \
 	$(SRC)/InfoBoxes/Panel/ATCReference.cpp \
+	$(SRC)/InfoBoxes/Panel/RadioEdit.cpp \
 	$(SRC)/Pan.cpp \
 	$(SRC)/Input/InputConfig.cpp \
 	$(SRC)/Input/InputDefaults.cpp \
@@ -731,6 +735,7 @@ XCSOAR_SOURCES += \
 	$(SRC)/Android/BluetoothHelper.cpp \
 	$(SRC)/Android/NativeLeScanCallback.cpp \
 	$(SRC)/Android/Battery.cpp \
+	$(SRC)/Android/GliderLink.cpp \
 	$(SRC)/Android/DownloadManager.cpp \
 	$(SRC)/Android/Vibrator.cpp \
 	$(SRC)/Android/Context.cpp \

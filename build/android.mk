@@ -16,11 +16,11 @@ else
   ANDROID_SDK ?= $(HOME)/opt/android-sdk-linux
 endif
 ANDROID_SDK_PLATFORM_DIR = $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)
-ANDROID_ABI_DIR = $(ANDROID_BUILD)/lib/$(ANDROID_ABI5)
+ANDROID_ABI_DIR = $(ANDROID_BUILD)/lib/$(ANDROID_APK_LIB_ABI)
 
 JAVA_CLASSFILES_DIR = $(ABI_BIN_DIR)/bin/classes
 
-ANDROID_BUILD_TOOLS_DIR = $(ANDROID_SDK)/build-tools/26.0.0
+ANDROID_BUILD_TOOLS_DIR = $(ANDROID_SDK)/build-tools/28.0.3
 ZIPALIGN = $(ANDROID_BUILD_TOOLS_DIR)/zipalign
 AAPT = $(ANDROID_BUILD_TOOLS_DIR)/aapt
 DX = $(ANDROID_BUILD_TOOLS_DIR)/dx
@@ -46,6 +46,7 @@ NATIVE_CLASSES := \
 	NativeInputListener \
 	DownloadUtil \
 	BatteryReceiver \
+	GliderLinkReceiver \
 	NativePortListener \
 	NativeLeScanCallback \
 	NativeBMP085Listener \
@@ -245,6 +246,7 @@ $(call SRC_TO_OBJ,$(SRC)/Android/Main.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/EventBridge.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/InternalSensors.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/Battery.cpp): $(NATIVE_HEADERS)
+$(call SRC_TO_OBJ,$(SRC)/Android/GliderLink.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativePortListener.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeLeScanCallback.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeInputListener.cpp): $(NATIVE_HEADERS)
@@ -284,7 +286,7 @@ $(HOME)/.android/debug.keystore:
 
 $(ANDROID_BIN)/XCSoar-debug.apk: $(ANDROID_BUILD)/unsigned.apk $(HOME)/.android/debug.keystore | $(ANDROID_BIN)/dirstamp
 	@$(NQ)echo "  SIGN    $@"
-	$(Q)$(JARSIGNER) -keystore $(HOME)/.android/debug.keystore -storepass android -signedjar $@ $< androiddebugkey
+	$(Q)$(JARSIGNER) -keystore $(HOME)/.android/debug.keystore -storepass android -digestalg SHA1 -sigalg MD5withRSA -signedjar $@ $< androiddebugkey
 
 $(ANDROID_BUILD)/XCSoar-release-unaligned.apk: $(ANDROID_BUILD)/unsigned.apk
 	@$(NQ)echo "  SIGN    $@"

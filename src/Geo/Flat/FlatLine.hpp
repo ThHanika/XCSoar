@@ -25,7 +25,7 @@
 
 #include "FlatPoint.hpp"
 #include "Math/Line2D.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 /**
  * Defines an infinite line in real-valued cartesian coordinates,
@@ -46,13 +46,6 @@ public:
    */
   constexpr
   FlatLine(const FlatPoint _p1, const FlatPoint _p2):Base(_p1, _p2) {}
-
-  /**
-   * Constructor default
-   *
-   * @return Initialised object at origin
-   */
-  FlatLine() = default;
 
   /** 
    * Calculate intersections between this line

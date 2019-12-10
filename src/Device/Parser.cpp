@@ -317,6 +317,10 @@ NMEAParser::GSA(NMEAInputLine &line, NMEAInfo &info)
 
   info.gps.satellite_ids_available.Update(info.clock);
 
+  info.gps.pdop = line.Read(-1.);
+  info.gps.hdop = line.Read(-1.);
+  info.gps.vdop = line.Read(-1.);
+
   return true;
 }
 
@@ -621,7 +625,7 @@ NMEAParser::GGA(NMEAInputLine &line, NMEAInfo &info)
   info.gps.nonexpiring_internal_gps = false;
 #endif
 
-  gps.hdop = line.Read(0.);
+  gps.hdop = line.Read(-1.);
 
   bool altitude_available = ReadAltitude(line, info.gps_altitude);
   if (altitude_available)

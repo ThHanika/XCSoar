@@ -40,6 +40,7 @@
 #include "Language/Language.hpp"
 #include "TeamActions.hpp"
 #include "Util/StringCompare.hxx"
+#include "Util/StringStrip.hxx"
 #include "Util/TruncateString.hpp"
 #include "Util/Macros.hpp"
 
@@ -79,7 +80,7 @@ private:
   virtual void Hide() override;
 
   /* virtual methods from class ActionListener */
-  virtual void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 
   /* virtual methods from class BlackboardListener */
   virtual void OnCalculatedUpdate(const MoreData &basic,
@@ -224,7 +225,7 @@ TeamCodeWidget::OnFlarmLockClicked()
 }
 
 void
-TeamCodeWidget::OnAction(int id)
+TeamCodeWidget::OnAction(int id) noexcept
 {
   switch (id) {
   case SET_CODE:

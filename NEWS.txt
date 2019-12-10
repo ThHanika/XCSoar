@@ -2,6 +2,7 @@ Version 7.0 - not yet released
 * LUA scripting
 * user interface
   - screen layout with 12 infoboxes on the left, vario+3 infoboxes on right
+  - new translation: Traditional Chinese
 * data files
   - optimise the terrain loader
   - support runway width in CUP files
@@ -9,11 +10,13 @@ Version 7.0 - not yet released
   - parse wind from standard NMEA sentence WMV
   - driver for XC Tracer Vario
   - driver for KRT2 radio
+  - driver for Air Control Display altimeter
   - show detailed error message in device list
   - FLARM/OGN - make it possible to set/download registered device database
   - device manager: show flag if device provides data from
       environmental sensors (temperature, humidity)
   - combine traffic from all FLARM devices (support both FLARM and OGN devices on board)
+  - GliderLink: new driver
 * weather
   - merge all weather data in one dialog
   - allow showing both terrain and RASP
@@ -26,6 +29,7 @@ Version 7.0 - not yet released
 * tracking
   - use DNS to resolve SkyLines server IP (#2604)
   - enable SkyLines traffic display on Windows
+  - add option to show SkyLines traffic names on the map
   - show thermals obtained from the XCSoar Cloud server
 * analysis
   - enhanced graphics: minor tics, color scheme, layout
@@ -50,6 +54,7 @@ Version 7.0 - not yet released
       climbing cruise (green), circling non-climb (orange)
   - improved auto-scaling of vario-like graphical infoboxes
   - new infobox: "Number Of Satellites"
+  - new infoboxes for radio frequencies, including setting the frequencies
 * Windows
   - drop support for Windows CE
   - require Windows Vista or later
@@ -58,13 +63,31 @@ Version 7.0 - not yet released
   - drop support for SDL 1.2
   - display rotation
 * Android
-  - drop support for ARMv6 CPUs
+  - drop support for ARMv6 and MIPS CPUs
 * Kobo
   - support Kobo Glo HD
+* Raspberry Pi
+  - resizable mouse cursor
 
-Version 6.8.12 - not yet released
+Version 6.8.13 - not yet released
+* devices
+  - LX: fix buffer overflow
+* Kobo
+  - fix build failure with GCC 9
+
+Version 6.8.12 - 2019/04/30
+* weather
+  - update source URLs for METARs and TAFs (https://)
 * Android
   - increase targetSdkVersion to 26 (required by Google Play)
+  - request storage and GPS permissions on Android 6+
+  - fix crash when permission to use GPS is revoked
+  - fix notification on Android 8+
+* Task Editor
+  - fixed task editor crashes (Ticket 3930).
+* devices
+  - IMI: raise max payload size to 2kB
+* fix IGC logger crash when no date is available
 
 Version 6.8.11 - 2018/08/18
 * terrain

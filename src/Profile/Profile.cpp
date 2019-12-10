@@ -65,13 +65,13 @@ Profile::LoadFile(Path path)
   try {
     LoadFile(map, path);
     LogFormat(_T("Loaded profile from %s"), path.c_str());
-  } catch (const std::runtime_error &e) {
-    LogError("Failed to load profile", e);
+  } catch (...) {
+    LogError(std::current_exception(), "Failed to load profile");
   }
 }
 
 void
-Profile::Save()
+Profile::Save() noexcept
 {
   if (!IsModified())
     return;
@@ -81,7 +81,12 @@ Profile::Save()
     SetFiles(nullptr);
 
   assert(!startProfileFile.IsNull());
-  SaveFile(startProfileFile);
+
+  try {
+    SaveFile(startProfileFile);
+  } catch (...) {
+    LogError(std::current_exception(), "Failed to save profile");
+  }
 }
 
 void

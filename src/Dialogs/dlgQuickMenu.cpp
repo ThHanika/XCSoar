@@ -34,6 +34,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Event/KeyCode.hpp"
 #include "Util/StaticArray.hxx"
+#include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
 #include "Menu/ButtonLabel.hpp"
 #include "Menu/MenuData.hpp"
@@ -121,7 +122,7 @@ protected:
 
 private:
   /* virtual methods from class ActionListener */
-  void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 };
 
 void
@@ -256,7 +257,7 @@ QuickMenu::KeyPress(unsigned key_code)
 }
 
 void
-QuickMenu::OnAction(int id)
+QuickMenu::OnAction(int id) noexcept
 {
   clicked_event = id;
   dialog.SetModalResult(mrOK);

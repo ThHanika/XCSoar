@@ -28,33 +28,36 @@ WorkerThread::WorkerThread(const char *_name,
                            unsigned _period_min, unsigned _idle_min,
                            unsigned _delay)
   :SuspensibleThread(_name),
-   period_min(_period_min), idle_min(_idle_min), delay(_delay) {
+   period_min(std::chrono::milliseconds(_period_min)),
+   idle_min(std::chrono::milliseconds(_idle_min)),
+   delay(std::chrono::milliseconds(_delay))
+{
 }
 
 void
-WorkerThread::Run()
+WorkerThread::Run() noexcept
 {
   PeriodClock clock;
 
-  const ScopeLock lock(mutex);
+  std::unique_lock<Mutex> lock(mutex);
 
   while (true) {
     /* wait for work */
     if (!trigger_flag) {
-      if (_CheckStoppedOrSuspended())
+      if (_CheckStoppedOrSuspended(lock))
         break;
 
       /* check trigger_flag again to avoid a race condition, because
          _CheckStoppedOrSuspended() may have unlocked the mutex while
          we were suspended */
       if (!trigger_flag)
-        trigger_cond.wait(mutex);
+        trigger_cond.wait(lock);
     }
 
     /* got the "stop" trigger? */
-    if (delay > 0
-        ? _WaitForStopped(delay)
-        : _CheckStoppedOrSuspended())
+    if (delay.count() > 0
+        ? _WaitForStopped(lock, delay)
+        : _CheckStoppedOrSuspended(lock))
       break;
 
     if (!trigger_flag)
@@ -66,20 +69,20 @@ WorkerThread::Run()
       const ScopeUnlock unlock(mutex);
 
       /* do the actual work */
-      if (period_min > 0)
+      if (period_min.count() > 0)
         clock.Update();
 
       Tick();
     }
 
-    unsigned idle = idle_min;
-    if (period_min > 0) {
-      unsigned elapsed = clock.Elapsed();
+    auto idle = idle_min;
+    if (period_min.count() > 0) {
+      const auto elapsed = clock.Elapsed();
       if (elapsed + idle < period_min)
         idle = period_min - elapsed;
     }
 
-    if (idle > 0 && _WaitForStopped(idle))
+    if (idle.count() > 0 && _WaitForStopped(lock, idle))
       break;
   }
 }

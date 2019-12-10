@@ -32,16 +32,16 @@ Copyright_License {
  * Main loop of the DrawThread
  */
 void
-DrawThread::Run()
+DrawThread::Run() noexcept
 {
   SetLowPriority();
 
-  const ScopeLock lock(mutex);
+  std::unique_lock<Mutex> lock(mutex);
 
   // circle until application is closed
-  while (!_CheckStoppedOrSuspended()) {
+  while (!_CheckStoppedOrSuspended(lock)) {
     if (!pending) {
-      command_trigger.wait(mutex);
+      command_trigger.wait(lock);
       continue;
     }
 

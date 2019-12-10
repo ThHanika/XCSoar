@@ -23,9 +23,10 @@ Copyright_License {
 
 #include "BallastDumpManager.hpp"
 #include "Engine/GlideSolvers/GlidePolar.hpp"
+#include "Time/Cast.hxx"
 
 void
-BallastDumpManager::Start()
+BallastDumpManager::Start() noexcept
 {
   assert(!IsEnabled());
   enabled = true;
@@ -35,14 +36,14 @@ BallastDumpManager::Start()
 }
 
 void
-BallastDumpManager::Stop()
+BallastDumpManager::Stop() noexcept
 {
   assert(IsEnabled());
   enabled = false;
 }
 
 void
-BallastDumpManager::SetEnabled(bool _enabled)
+BallastDumpManager::SetEnabled(bool _enabled) noexcept
 {
   if (_enabled && !IsEnabled())
     Start();
@@ -51,7 +52,8 @@ BallastDumpManager::SetEnabled(bool _enabled)
 }
 
 bool
-BallastDumpManager::Update(GlidePolar &glide_polar, unsigned dump_time)
+BallastDumpManager::Update(GlidePolar &glide_polar,
+                           unsigned dump_time) noexcept
 {
   assert(IsEnabled());
 
@@ -62,16 +64,10 @@ BallastDumpManager::Update(GlidePolar &glide_polar, unsigned dump_time)
   }
 
   // Milliseconds since last ballast_clock.Update() call
-  int dt = ballast_clock.Elapsed();
-
-  // Update ballast_clock for the next call to BallastDumpManager::Update()
-  ballast_clock.Update();
-
-  // How many percent of the max. ballast do we dump in one millisecond
-  auto percent_per_millisecond = 1. / (1000 * dump_time);
+  const auto dt = ballast_clock.ElapsedUpdate();
 
   // Calculate the new ballast percentage
-  auto ballast = glide_polar.GetBallast() - dt * percent_per_millisecond;
+  auto ballast = glide_polar.GetBallast() - ToFloatSeconds(dt) / dump_time;
 
   // Check if the plane is dry now
   if (ballast < 0) {

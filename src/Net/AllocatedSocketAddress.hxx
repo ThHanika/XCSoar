@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2017 Max Kellermann <max.kellermann@gmail.com>
+ * Copyright 2012-2019 Max Kellermann <max.kellermann@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,9 +32,9 @@
 
 #include "SocketAddress.hxx"
 #include "Features.hxx"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
-#include <algorithm>
+#include <utility>
 
 #include <stdlib.h>
 
@@ -79,18 +79,22 @@ public:
 	}
 
 	AllocatedSocketAddress &operator=(AllocatedSocketAddress &&src) noexcept {
-		std::swap(address, src.address);
-		std::swap(size, src.size);
+		using std::swap;
+		swap(address, src.address);
+		swap(size, src.size);
 		return *this;
 	}
 
+	template<typename T>
 	gcc_pure
-	bool operator==(SocketAddress other) const noexcept {
-		return (SocketAddress)*this == other;
+	bool operator==(T &&other) const noexcept {
+		return (SocketAddress)*this == std::forward<T>(other);
 	}
 
-	bool operator!=(SocketAddress other) const noexcept {
-		return !(*this == other);
+	template<typename T>
+	gcc_pure
+	bool operator!=(T &&other) const noexcept {
+		return !(*this == std::forward<T>(other));
 	}
 
 	gcc_const
@@ -138,6 +142,20 @@ public:
 
 #ifdef HAVE_UN
 	/**
+	 * @see SocketAddress::GetLocalRaw()
+	 */
+	gcc_pure
+	StringView GetLocalRaw() const noexcept;
+
+	/**
+	 * @see SocketAddress::GetLocalPath()
+	 */
+	gcc_pure
+	const char *GetLocalPath() const noexcept {
+		return ((SocketAddress)*this).GetLocalPath();
+	}
+
+	/**
 	 * Make this a "local" address (UNIX domain socket).  If the path
 	 * begins with a '@', then the rest specifies an "abstract" local
 	 * address.
@@ -146,6 +164,14 @@ public:
 #endif
 
 #ifdef HAVE_TCP
+	bool IsV6Any() const noexcept {
+		return ((SocketAddress)*this).IsV6Any();
+	}
+
+	bool IsV4Mapped() const noexcept {
+		return ((SocketAddress)*this).IsV4Mapped();
+	}
+
 	/**
 	 * Extract the port number.  Returns 0 if not applicable.
 	 */

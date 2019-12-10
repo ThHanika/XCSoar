@@ -39,6 +39,7 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Profile/Current.hpp"
+#include "ActionInterface.hpp"
 
 enum Commands {
   REPLACE_IN_TASK,
@@ -60,8 +61,8 @@ ReplaceInTask(ProtectedTaskManager &task_manager,
   case MapTaskManager::SUCCESS:
     try {
       task_manager.TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      ShowError(e, _("Failed to save file."));
+    } catch (...) {
+      ShowError(std::current_exception(), _("Failed to save file."));
       return false;
     }
 
@@ -98,8 +99,8 @@ InsertInTask(ProtectedTaskManager &task_manager,
   case MapTaskManager::SUCCESS:
     try {
       task_manager.TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      ShowError(e, _("Failed to save file."));
+    } catch (...) {
+      ShowError(std::current_exception(), _("Failed to save file."));
       return false;
     }
 
@@ -138,8 +139,8 @@ AppendToTask(ProtectedTaskManager &task_manager,
   case MapTaskManager::SUCCESS:
     try {
       task_manager.TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      ShowError(e, _("Failed to save file."));
+    } catch (...) {
+      ShowError(std::current_exception(), _("Failed to save file."));
       return false;
     }
 
@@ -178,8 +179,8 @@ RemoveFromTask(ProtectedTaskManager &task_manager,
   case MapTaskManager::SUCCESS:
     try {
       task_manager.TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      ShowError(e, _("Failed to save file."));
+    } catch (...) {
+      ShowError(std::current_exception(), _("Failed to save file."));
       return false;
     }
 
@@ -231,7 +232,7 @@ ActivatePan(const Waypoint &waypoint)
 }
 
 void
-WaypointCommandsWidget::OnAction(int id)
+WaypointCommandsWidget::OnAction(int id) noexcept
 {
   MessageOperationEnvironment env;
 
@@ -268,13 +269,13 @@ WaypointCommandsWidget::OnAction(int id)
     break;
 
   case SET_ACTIVE_FREQUENCY:
-    device_blackboard->SetActiveFrequency(waypoint->radio_frequency,
-                                          waypoint->name.c_str(), env);
+    ActionInterface::SetActiveFrequency(waypoint->radio_frequency,
+                                        waypoint->name.c_str());
     break;
 
   case SET_STANDBY_FREQUENCY:
-    device_blackboard->SetStandbyFrequency(waypoint->radio_frequency,
-                                           waypoint->name.c_str(), env);
+    ActionInterface::SetStandbyFrequency(waypoint->radio_frequency,
+                                         waypoint->name.c_str());
     break;
 
   case EDIT:
@@ -296,8 +297,8 @@ WaypointCommandsWidget::OnAction(int id)
 
         try {
           WaypointGlue::SaveWaypoints(way_points);
-        } catch (const std::runtime_error &e) {
-          ShowError(e, _("Failed to save waypoints"));
+        } catch (...) {
+          ShowError(std::current_exception(), _("Failed to save waypoints"));
         }
       }
     }

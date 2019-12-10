@@ -24,13 +24,13 @@ Copyright_License {
 #ifndef XCSOAR_VALIDITY_HPP
 #define XCSOAR_VALIDITY_HPP
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
+#include <chrono>
 #include <type_traits>
 
 #include <assert.h>
 #include <stdint.h>
-#include <math.h>
 
 /**
  * This keeps track when a value was last changed, to check if it was
@@ -40,35 +40,17 @@ Copyright_License {
 class Validity {
   static constexpr int BITS = 6;
 
-  uint32_t last;
+  using Duration = std::chrono::duration<uint32_t, std::ratio<1, 1 << BITS>>;
+  using FloatDuration = std::chrono::duration<double>;
 
-  gcc_const
-  static uint32_t Import(double time) {
-#ifdef __BIONIC__
-    /* ldexp() is utterly broken on Bionic, but ldexpf() works - which
-       is good enough here */
-    // https://code.google.com/p/android/issues/detail?id=203996
-    return (uint32_t)ldexpf(time, BITS);
-#else
-    return (uint32_t)ldexp(time, BITS);
-#endif
+  Duration last;
+
+  static constexpr Duration Import(double time) noexcept {
+    return std::chrono::duration_cast<Duration>(FloatDuration(time));
   }
 
-  constexpr
-  static uint32_t Import(unsigned time) {
-    return (uint32_t)(time << BITS);
-  }
-
-  gcc_const
-  static double Export(uint32_t i) {
-#ifdef __BIONIC__
-    /* ldexp() is utterly broken on Bionic, but ldexpf() works - which
-       is good enough here */
-    // https://code.google.com/p/android/issues/detail?id=203996
-    return ldexpf(i, -BITS);
-#else
-    return ldexp(i, -BITS);
-#endif
+  static constexpr double Export(Duration i) noexcept {
+    return std::chrono::duration_cast<FloatDuration>(i).count();
   }
 
 public:
@@ -80,14 +62,15 @@ public:
   /**
    * Initialize the object with the specified timestamp.
    */
-  explicit Validity(double _last):last(Import(_last)) {}
+  explicit constexpr Validity(double _last) noexcept
+    :last(Import(_last)) {}
 
 public:
   /**
    * Clears the time stamp, marking the referenced value "invalid".
    */
   void Clear() {
-    last = 0;
+    last = Duration::zero();
   }
 
   /**
@@ -107,9 +90,10 @@ public:
    * @param max_age the maximum age in seconds
    * @return true if the value is expired
    */
-  bool Expire(double _now, double _max_age) {
-    const uint32_t now = Import(_now);
-    const uint32_t max_age = Import(_max_age);
+  bool Expire(double _now,
+              std::chrono::steady_clock::duration _max_age) noexcept {
+    const auto now = Import(_now);
+    const auto max_age = std::chrono::duration_cast<Duration>(_max_age);
 
     if (IsValid() &&
         (now < last || /* time warp? */
@@ -128,19 +112,20 @@ public:
    * @param max_age the maximum age in seconds
    * @return true if the value is expired
    */
-  bool IsOlderThan(double _now, double _max_age) const {
+  bool IsOlderThan(double _now,
+                   std::chrono::steady_clock::duration _max_age) const noexcept {
     if (!IsValid())
       return true;
 
-    const uint32_t now = Import(_now);
-    const uint32_t max_age = Import(_max_age);
+    const auto now = Import(_now);
+    const auto max_age = std::chrono::duration_cast<Duration>(_max_age);
 
     return (now < last || /* time warp? */
             now > last + max_age); /* expired? */
   }
 
   constexpr bool IsValid() const {
-    return last > 0;
+    return last > Duration::zero();
   }
 
   /**
@@ -148,11 +133,11 @@ public:
    * @param other The second Validity object
    * @return The time difference in seconds
    */
-  double GetTimeDifference(const Validity &other) const {
+  FloatDuration GetTimeDifference(const Validity &other) const noexcept {
     assert(IsValid());
     assert(other.IsValid());
 
-    return Export(last - other.last);
+    return std::chrono::duration_cast<FloatDuration>(last - other.last);
   }
 
   /**
@@ -190,11 +175,14 @@ public:
    * @return true if a time warp has occurred and this object has been
    * cleared, false if this object is within range
    */
-  bool FixTimeWarp(const Validity &current, unsigned max_period=300) {
+  bool FixTimeWarp(const Validity &current,
+                   std::chrono::steady_clock::duration _max_period=std::chrono::minutes(5)) noexcept {
     if (!IsValid())
       return false;
 
-    if (last + Import(max_period) < current.last || last > current.last) {
+    const auto max_period = std::chrono::duration_cast<Duration>(_max_period);
+
+    if (last + max_period < current.last || last > current.last) {
       /* out of range, this is a time warp */
       Clear();
       return true;

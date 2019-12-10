@@ -36,7 +36,7 @@ TerrainThread::Trigger(const WindowProjection &projection)
 {
   assert(projection.IsValid());
 
-  const ScopeLock protect(mutex);
+  const std::lock_guard<Mutex> lock(mutex);
 
   GeoPoint center = projection.GetGeoScreenCenter();
   auto radius = projection.GetScreenWidthMeters() / 2;
@@ -50,7 +50,7 @@ TerrainThread::Trigger(const WindowProjection &projection)
 }
 
 void
-TerrainThread::Tick()
+TerrainThread::Tick() noexcept
 {
   SetIdlePriority(); // TODO: call only once
 

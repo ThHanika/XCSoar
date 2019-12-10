@@ -48,9 +48,9 @@ MapVehicleTypeToLivetrack24(LiveTrack24::Settings::VehicleType vt)
   return vehicleTypeMap[vti];
 }
 
-TrackingGlue::TrackingGlue(boost::asio::io_service &io_service)
+TrackingGlue::TrackingGlue(boost::asio::io_context &io_context)
   :StandbyThread("Tracking"),
-   skylines(io_service, this)
+   skylines(io_context, this)
 {
   settings.SetDefaults();
   LiveTrack24::SetServer(settings.livetrack24.server);
@@ -59,14 +59,14 @@ TrackingGlue::TrackingGlue(boost::asio::io_service &io_service)
 void
 TrackingGlue::StopAsync()
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   StandbyThread::StopAsync();
 }
 
 void
 TrackingGlue::WaitStopped()
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   StandbyThread::WaitStopped();
 }
 
@@ -88,7 +88,7 @@ TrackingGlue::SetSettings(const TrackingSettings &_settings)
   } else {
     /* no fundamental setting changes; the write needs to be protected
        by the mutex, because another job may be running already */
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     settings = _settings;
   }
 }
@@ -98,8 +98,8 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
 {
   try {
     skylines.Tick(basic, calculated);
-  } catch (const std::runtime_error &e) {
-    LogError("SkyLines error", e);
+  } catch (...) {
+    LogError(std::current_exception(), "SkyLines error");
   }
 
   if (!settings.livetrack24.enabled)
@@ -113,11 +113,11 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
     /* can't track without a valid GPS fix */
     return;
 
-  if (!clock.CheckUpdate(settings.livetrack24.interval * 1000))
+  if (!clock.CheckUpdate(std::chrono::seconds(settings.livetrack24.interval)))
     /* later */
     return;
 
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   if (IsBusy())
     /* still running, skip this submission */
     return;
@@ -146,7 +146,7 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
 }
 
 void
-TrackingGlue::Tick()
+TrackingGlue::Tick() noexcept
 {
   if (!settings.livetrack24.enabled)
     /* settings have been cleared meanwhile, bail out */
@@ -211,8 +211,8 @@ TrackingGlue::Tick()
                               location, altitude, ground_speed, track,
                               current_timestamp,
                               env);
-  } catch (const std::exception &exception) {
-    LogError("LiveTrack24 error", exception);
+  } catch (...) {
+    LogError(std::current_exception(), "LiveTrack24 error");
   }
 }
 
@@ -223,7 +223,7 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
   bool user_known;
 
   {
-    const ScopeLock protect(skylines_data.mutex);
+    const std::lock_guard<Mutex> lock(skylines_data.mutex);
     const SkyLinesTracking::Data::Traffic traffic(time_of_day_ms,
                                                   location, altitude);
     skylines_data.traffic[pilot_id] = traffic;
@@ -240,7 +240,7 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
 void
 TrackingGlue::OnUserName(uint32_t user_id, const TCHAR *name)
 {
-  const ScopeLock protect(skylines_data.mutex);
+  const std::lock_guard<Mutex> lock(skylines_data.mutex);
   skylines_data.user_names[user_id] = name;
 }
 
@@ -248,7 +248,7 @@ void
 TrackingGlue::OnWave(unsigned time_of_day_ms,
                      const GeoPoint &a, const GeoPoint &b)
 {
-  const ScopeLock protect(skylines_data.mutex);
+  const std::lock_guard<Mutex> lock(skylines_data.mutex);
 
   /* garbage collection - hard-coded upper limit */
   auto n = skylines_data.waves.size();
@@ -264,7 +264,7 @@ TrackingGlue::OnThermal(unsigned time_of_day_ms,
                         const AGeoPoint &bottom, const AGeoPoint &top,
                         double lift)
 {
-  const ScopeLock protect(skylines_data.mutex);
+  const std::lock_guard<Mutex> lock(skylines_data.mutex);
 
   /* garbage collection - hard-coded upper limit */
   auto n = skylines_data.thermals.size();
@@ -276,7 +276,7 @@ TrackingGlue::OnThermal(unsigned time_of_day_ms,
 }
 
 void
-TrackingGlue::OnSkyLinesError(const std::exception &e)
+TrackingGlue::OnSkyLinesError(std::exception_ptr e)
 {
-  LogError("SkyLines error", e);
+  LogError(e, "SkyLines error");
 }

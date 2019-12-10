@@ -60,7 +60,7 @@ MapOverlayBitmap::MapOverlayBitmap(Path path)
  * Convert a GeoPoint to a "fake" flat DoublePoint2D.  This conversion
  * is flawed in many ways, but good enough for clipping polygons.
  */
-static inline constexpr DoublePoint2D
+static constexpr DoublePoint2D
 GeoTo2D(GeoPoint p)
 {
   return {p.longitude.Native(), p.latitude.Native()};
@@ -69,7 +69,7 @@ GeoTo2D(GeoPoint p)
 /**
  * Inverse of GeoTo2D().
  */
-static inline constexpr GeoPoint
+static constexpr GeoPoint
 GeoFrom2D(DoublePoint2D p)
 {
   return {Angle::Native(p.x), Angle::Native(p.y)};
@@ -155,15 +155,9 @@ MapOverlayBitmap::Draw(Canvas &canvas,
 
   const ScopeTextureConstantAlpha blend(use_bitmap_alpha, alpha);
 
-#ifdef USE_GLSL
   glEnableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
   glVertexAttribPointer(OpenGL::Attribute::TEXCOORD, 2, GL_FLOAT, GL_FALSE,
                         0, coord);
-#else
-  const GLEnable<GL_TEXTURE_2D> scope;
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glTexCoordPointer(2, GL_FLOAT, 0, coord);
-#endif
 
   for (const auto &polygon : clipped) {
     const auto &ring = polygon.outer();
@@ -188,9 +182,5 @@ MapOverlayBitmap::Draw(Canvas &canvas,
     glDrawArrays(GL_TRIANGLE_FAN, 0, n);
   }
 
-#ifdef USE_GLSL
   glDisableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
-#else
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#endif
 }

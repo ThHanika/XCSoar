@@ -56,14 +56,14 @@ TopographyThread::Trigger(const WindowProjection &_projection)
   scale_threshold = store.GetNextScaleThreshold(_projection.GetMapScale());
 
   {
-    const ScopeLock protect(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     next_projection = _projection;
     StandbyThread::Trigger();
   }
 }
 
 void
-TopographyThread::Tick()
+TopographyThread::Tick() noexcept
 {
   // TODO: call only once
   SetIdlePriority();

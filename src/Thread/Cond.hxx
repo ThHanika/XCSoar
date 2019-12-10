@@ -30,15 +30,15 @@
 #ifndef THREAD_COND_HXX
 #define THREAD_COND_HXX
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include "WindowsCond.hxx"
 class Cond : public WindowsCond {};
 
 #else
 
-#include "PosixCond.hxx"
-class Cond : public PosixCond {};
+#include <condition_variable>
+using Cond = std::condition_variable;
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 Content Management AG
+ * Copyright 2007-2019 Content Management AG
  * All rights reserved.
  *
  * author: Max Kellermann <mk@cm4all.com>
@@ -42,6 +42,8 @@ PrintException(const std::exception &e) noexcept
 		std::rethrow_if_nested(e);
 	} catch (const std::exception &nested) {
 		PrintException(nested);
+	} catch (const char *s) {
+		fprintf(stderr, "%s\n", s);
 	} catch (...) {
 		fprintf(stderr, "Unrecognized nested exception\n");
 	}
@@ -54,6 +56,8 @@ PrintException(const std::exception_ptr &ep) noexcept
 		std::rethrow_exception(ep);
 	} catch (const std::exception &e) {
 		PrintException(e);
+	} catch (const char *s) {
+		fprintf(stderr, "%s\n", s);
 	} catch (...) {
 		fprintf(stderr, "Unrecognized exception\n");
 	}

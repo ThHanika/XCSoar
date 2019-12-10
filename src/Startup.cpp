@@ -73,7 +73,7 @@ Copyright_License {
 #include "Net/HTTP/DownloadManager.hpp"
 #include "Hardware/DisplayDPI.hpp"
 #include "Hardware/DisplayGlue.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "NMEA/Aircraft.hpp"
 #include "Waypoint/Waypoints.hpp"
 #include "Waypoint/WaypointGlue.hpp"
@@ -138,8 +138,8 @@ AfterStartup()
   try {
     const auto lua_path = LocalPath(_T("lua"));
     Lua::StartFile(AllocatedPath::Build(lua_path, _T("init.lua")));
-  } catch (const std::runtime_error &e) {
-      LogError(e);
+  } catch (...) {
+      LogError(std::current_exception());
   }
 
   if (is_simulator()) {
@@ -305,8 +305,8 @@ Startup()
   if (CommandLine::replay_path != nullptr) {
     try {
       replay->Start(Path(CommandLine::replay_path));
-    } catch (const std::runtime_error &e) {
-      LogError(e);
+    } catch (...) {
+      LogError(std::current_exception());
     }
   }
 #endif
@@ -578,8 +578,8 @@ Shutdown()
   if (protected_task_manager != nullptr) {
     try {
       protected_task_manager->TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      LogError(e);
+    } catch (...) {
+      LogError(std::current_exception());
     }
   }
 

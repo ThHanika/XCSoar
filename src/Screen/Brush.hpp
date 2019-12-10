@@ -27,7 +27,7 @@ Copyright_License {
 #include "Screen/Color.hpp"
 #include "Screen/Features.hpp"
 #include "Debug.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <assert.h>
 
@@ -134,11 +134,9 @@ public:
     color.Bind();
   }
 
-#ifdef USE_GLSL
   void BindUniform(GLint location) const {
     color.Uniform(location);
   }
-#endif
 #endif /* OPENGL */
 };
 

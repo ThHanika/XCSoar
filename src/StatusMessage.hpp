@@ -24,7 +24,9 @@ Copyright_License {
 #ifndef XCSOAR_STATUS_MESSAGE_H
 #define XCSOAR_STATUS_MESSAGE_H
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
+
+#include <chrono>
 
 #include <tchar.h>
 
@@ -41,7 +43,7 @@ struct StatusMessage {
   bool visible;
 
   /** Delay for DoStatusMessage */
-  unsigned delay_ms;
+  std::chrono::steady_clock::duration delay;
 };
 
 gcc_pure

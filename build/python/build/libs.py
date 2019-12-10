@@ -40,9 +40,9 @@ musl = AutotoolsProject(
 )
 
 libstdcxx_musl_headers = LibstdcxxMuslHeadersProject(
-    'https://ftp.gnu.org/gnu/gcc/gcc-6.4.0/gcc-6.4.0.tar.xz',
-    'http://mirrors.ibiblio.org/gnu/ftp/gnu/gcc/gcc-6.4.0/gcc-6.4.0.tar.xz',
-    '850bf21eafdfe5cd5f6827148184c08c4a0852a37ccf36ce69855334d2c914d4',
+    'https://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.xz',
+    'http://mirrors.ibiblio.org/gnu/ftp/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.xz',
+    '64baadfe6cc0f4947a84cb12d7f0dfaf45bb58b7e92461639596c21e02d97d2c',
     'include/libstdc++/algorithm',
     [
         '--enable-clocale=generic',
@@ -97,9 +97,9 @@ zlib = ZlibProject(
 )
 
 freetype = FreeTypeProject(
-    'http://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.bz2',
-    'http://downloads.sourceforge.net/project/freetype/freetype2/2.8.1/freetype-2.8.1.tar.bz2',
-    'e5435f02e02d2b87bb8e4efdcaa14b1f78c9cf3ab1ed80f94b6382fb6acc7d78',
+    'http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2',
+    'http://downloads.sourceforge.net/project/freetype/freetype2/2.9.1/freetype-2.9.1.tar.bz2',
+    'db8d87ea720ea9d5edc5388fc7a0497bb11ba9fe972245e0f7f4c7e8b1e1e84d',
     'lib/libfreetype.a',
     [
         '--disable-shared', '--enable-static',
@@ -109,9 +109,9 @@ freetype = FreeTypeProject(
 )
 
 curl = CurlProject(
-    'http://curl.haxx.se/download/curl-7.61.0.tar.xz',
-    'https://github.com/curl/curl/releases/download/curl-7_61_0/curl-7.61.0.tar.xz',
-    'ef6e55192d04713673b4409ccbcb4cb6cd723137d6e10ca45b0c593a454e1720',
+    'http://curl.haxx.se/download/curl-7.64.1.tar.xz',
+    'https://github.com/curl/curl/releases/download/curl-7_64_1/curl-7.64.1.tar.xz',
+    '9252332a7f871ce37bfa7f78bdd0a0e3924d8187cc27cb57c76c9474a7168fb3',
     'lib/libcurl.a',
     [
         '--disable-shared', '--enable-static',
@@ -146,9 +146,9 @@ proj = AutotoolsProject(
 )
 
 libpng = LibPNGProject(
-    'ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.34.tar.xz',
-    'http://downloads.sourceforge.net/project/libpng/libpng16/1.6.34/libpng-1.6.34.tar.xz',
-    '2f1e960d92ce3b3abd03d06dfec9637dfbd22febf107a536b44f7a47c60659f6',
+    'ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.36.tar.xz',
+    'http://downloads.sourceforge.net/project/libpng/libpng16/1.6.36/libpng-1.6.36.tar.xz',
+    'eceb924c1fa6b79172fdfd008d335f0e59172a86a66481e09d4089df872aa319',
     'lib/libpng.a',
     [
         '--disable-shared', '--enable-static',
@@ -185,9 +185,9 @@ simple_usbmodeswitch = AutotoolsProject(
 )
 
 libtiff = AutotoolsProject(
-    'http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz',
-    'http://ftp.lfs-matrix.net/pub/blfs/conglomeration/tiff/tiff-4.0.9.tar.gz',
-    '6e7bdeec2c310734e734d19aae3a71ebe37a4d842e0e23dbb1b8921c0026cfcd',
+    'http://download.osgeo.org/libtiff/tiff-4.0.10.tar.gz',
+    'http://ftp.lfs-matrix.net/pub/blfs/conglomeration/tiff/tiff-4.0.10.tar.gz',
+    '2c52d11ccaf767457db0c46795d9c7d1a8d8f76f68b0b800a3dfe45786b996e4',
     'lib/libtiff.a',
     [
         '--disable-shared', '--enable-static',

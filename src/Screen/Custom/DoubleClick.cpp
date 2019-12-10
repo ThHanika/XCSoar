@@ -21,36 +21,11 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_DATE_UTIL_HPP
-#define XCSOAR_DATE_UTIL_HPP
+#include "DoubleClick.hpp"
 
-#include "Compiler.h"
-
-gcc_const
-static inline bool
-IsLeapYear(unsigned y)
-{
-    y += 1900;
-    return (y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0);
-}
-
-gcc_const
-static inline unsigned
-DaysInFebruary(unsigned year)
-{
-  return IsLeapYear(year) ? 29 : 28;
-}
-
-gcc_const
-static inline unsigned
-DaysInMonth(unsigned month, unsigned year)
-{
-  if (month == 4 || month == 6 || month == 9 || month == 11)
-    return 30;
-  else if (month != 2)
-    return 31;
-  else
-    return DaysInFebruary(year);
-}
-
+/* Workaround for some GCC versions which don't inline the constexpr
+   despite being defined so in C++17, see
+   http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0386r2.pdf */
+#if GCC_OLDER_THAN(9,0)
+constexpr std::chrono::milliseconds DoubleClick::INTERVAL;
 #endif

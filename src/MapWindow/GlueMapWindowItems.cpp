@@ -132,7 +132,9 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
 
     if (!list.full()) {
 #ifndef ENABLE_OPENGL
-      const ScopeLock protect(mutex);
+
+    const std::lock_guard<Mutex> lock(mutex);
+
 #endif
 
       if (rasp_renderer && rasp_renderer->IsInside(location))

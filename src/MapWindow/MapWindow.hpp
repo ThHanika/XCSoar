@@ -37,7 +37,7 @@ Copyright_License {
 #include "Renderer/BackgroundRenderer.hpp"
 #include "Renderer/WaypointRenderer.hpp"
 #include "Renderer/TrailRenderer.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Weather/Features.hpp"
 #include "Tracking/SkyLines/Features.hpp"
 
@@ -306,6 +306,7 @@ protected:
   void DrawGlideThroughTerrain(Canvas &canvas) const;
   void DrawTerrainAbove(Canvas &canvas);
   void DrawFLARMTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
+  void DrawGLinkTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
 
   // thread, main functions
   /**

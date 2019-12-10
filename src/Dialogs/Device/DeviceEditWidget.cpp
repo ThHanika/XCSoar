@@ -24,7 +24,7 @@
 #include "DeviceEditWidget.hpp"
 #include "Dialogs/ComboPicker.hpp"
 #include "UIGlobals.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Util/Macros.hpp"
 #include "Util/NumberParser.hpp"
 #include "Language/Language.hpp"
@@ -68,6 +68,7 @@ static constexpr struct {
 #ifdef ANDROID
   { DeviceConfig::PortType::RFCOMM_SERVER, N_("Bluetooth server") },
   { DeviceConfig::PortType::DROIDSOAR_V2, _T("DroidSoar V2") },
+  { DeviceConfig::PortType::GLIDER_LINK, _T("GliderLink traffic receiver") },
 #ifndef NDEBUG
   { DeviceConfig::PortType::NUNCHUCK, N_("IOIO switches and Nunchuk") },
 #endif
@@ -131,7 +132,7 @@ DetectSerialPorts(DataFieldEnum &df)
 
 #endif
 
-#if defined(WIN32) && !defined(HAVE_POSIX)
+#if defined(_WIN32) && !defined(HAVE_POSIX)
 
 static void
 FillDefaultSerialPorts(DataFieldEnum &df)
@@ -171,7 +172,7 @@ FillSerialPorts(DataFieldEnum &df, const DeviceConfig &config)
 {
 #if defined(HAVE_POSIX)
   DetectSerialPorts(df);
-#elif defined(WIN32)
+#elif defined(_WIN32)
   FillDefaultSerialPorts(df);
 #endif
 
@@ -316,6 +317,7 @@ SetPort(DataFieldEnum &df, const DeviceConfig &config)
   case DeviceConfig::PortType::UDP_LISTENER:
   case DeviceConfig::PortType::PTY:
   case DeviceConfig::PortType::RFCOMM_SERVER:
+  case DeviceConfig::PortType::GLIDER_LINK:
     break;
 
   case DeviceConfig::PortType::SERIAL:
@@ -363,11 +365,11 @@ EditPortCallback(const TCHAR *caption, DataField &_df,
 
 #ifdef ANDROID
   if (item.int_value == SCAN_BLUETOOTH_LE) {
-    char address[32];
-    if (!ScanBluetoothLeDialog(address, sizeof(address)))
+    auto address = ScanBluetoothLeDialog();
+    if (address.empty())
         return false;
 
-    SetPort(df, DeviceConfig::PortType::RFCOMM, address);
+    SetPort(df, DeviceConfig::PortType::RFCOMM, address.c_str());
     return true;
   }
 #endif
@@ -698,6 +700,7 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
   case DeviceConfig::PortType::TCP_LISTENER:
   case DeviceConfig::PortType::UDP_LISTENER:
   case DeviceConfig::PortType::RFCOMM_SERVER:
+  case DeviceConfig::PortType::GLIDER_LINK:
     if (new_type == config.port_type)
       return false;
 

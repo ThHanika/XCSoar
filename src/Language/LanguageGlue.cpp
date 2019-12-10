@@ -41,7 +41,7 @@ Copyright_License {
 #include "Java/Object.hxx"
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -61,7 +61,7 @@ static MOLoader *mo_loader;
 
 #ifdef HAVE_BUILTIN_LANGUAGES
 
-#ifndef WIN32
+#ifndef _WIN32
 /**
  * Several fake WIN32 constants.  These are not used on Android, but
  * we need them or we have to have a separate version of
@@ -70,6 +70,7 @@ static MOLoader *mo_loader;
 enum {
   LANG_NULL,
   LANG_CHINESE,
+  LANG_CHINESE_TRADITIONAL,
   LANG_CZECH,
   LANG_DANISH,
   LANG_GERMAN,
@@ -160,10 +161,13 @@ extern "C"
   extern const size_t vi_mo_size;
   extern const uint8_t zh_CN_mo[];
   extern const size_t zh_CN_mo_size;
+  extern const uint8_t zh_Hant_mo[];
+  extern const size_t zh_Hant_mo_size;
 }
 
 const BuiltinLanguage language_table[] = {
   { LANG_CHINESE, zh_CN_mo, zh_CN_mo_size, _T("zh_CN.mo"), _T("Simplified Chinese") },
+  { LANG_CHINESE_TRADITIONAL, zh_Hant_mo, zh_Hant_mo_size, _T("zh_Hant.mo"), _T("Traditional Chinese") },
   { LANG_CZECH, cs_mo, cs_mo_size, _T("cs.mo"), _T("Czech") },
   { LANG_DANISH, da_mo, da_mo_size, _T("da.mo"), _T("Danish") },
   { LANG_GERMAN, de_mo, de_mo_size, _T("de.mo"), _T("German") },
@@ -199,7 +203,7 @@ const BuiltinLanguage language_table[] = {
   { 0, nullptr, 0, nullptr, nullptr }
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 
 gcc_pure
 static const BuiltinLanguage *
@@ -247,11 +251,9 @@ DetectLanguage()
                                          "()Ljava/util/Locale;");
   assert(cid != NULL);
 
-  jobject _obj = env->CallStaticObjectMethod(cls, cid);
-  if (_obj == NULL)
+  Java::LocalObject obj(env, env->CallStaticObjectMethod(cls, cid));
+  if (!obj)
     return NULL;
-
-  Java::LocalObject obj(env, _obj);
 
   // Call function Locale.getLanguage() that
   // returns a two-letter language string
@@ -288,7 +290,7 @@ DetectLanguage()
   // Return e.g. "de.mo"
   return FindLanguage(language_buffer);
 
-#elif defined(WIN32)
+#elif defined(_WIN32)
 
   // Retrieve the default user language identifier from the OS
   LANGID lang_id = GetUserDefaultUILanguage();

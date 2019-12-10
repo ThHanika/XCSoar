@@ -94,7 +94,7 @@ TaskManagerDialog::OnPageFlipped()
 }
 
 void
-TaskManagerDialog::OnAction(int id)
+TaskManagerDialog::OnAction(int id) noexcept
 {
   switch (id) {
   case MAP:
@@ -222,8 +222,8 @@ TaskManagerDialog::Commit()
 
     try {
       protected_task_manager->TaskSaveDefault();
-    } catch (const std::runtime_error &e) {
-      ShowError(e, _("Failed to save file."));
+    } catch (...) {
+      ShowError(std::current_exception(), _("Failed to save file."));
       return false;
     }
 
@@ -245,6 +245,17 @@ TaskManagerDialog::Revert()
   OrderedTask *temp = protected_task_manager->TaskClone();
   delete task;
   task = temp;
+  /**
+   * \todo Having local pointers scattered about is an accident waiting to
+   *       happen. Need a semantic that provides the authoritative pointer to
+   *       the current task to all.
+   */
+  /**
+   * Update our widget's ordered task because it is now out of date.
+   */
+  auto &task_view = (ButtonWidget &)GetExtra();
+  auto &renderer = (TaskMapButtonRenderer &)task_view.GetRenderer();
+  renderer.SetTask(task);
   modified = false;
 }
 

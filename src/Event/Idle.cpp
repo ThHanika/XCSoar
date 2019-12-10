@@ -29,7 +29,7 @@ static PeriodClock user_idle_clock;
 bool
 IsUserIdle(unsigned duration_ms)
 {
-  return user_idle_clock.Check(duration_ms);
+  return user_idle_clock.Check(std::chrono::milliseconds(duration_ms));
 }
 
 /**

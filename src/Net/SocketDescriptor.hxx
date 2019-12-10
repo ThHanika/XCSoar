@@ -36,6 +36,8 @@
 
 class SocketAddress;
 class StaticSocketAddress;
+class IPv4Address;
+class IPv6Address;
 
 /**
  * An OO wrapper for a UNIX socket descriptor.
@@ -136,6 +138,69 @@ public:
 	 */
 	bool Create(int domain, int type, int protocol) noexcept;
 
+	/**
+	 * Like Create(), but enable non-blocking mode.
+	 */
+	bool CreateNonBlock(int domain, int type, int protocol) noexcept;
+
+#ifndef _WIN32
+	static bool CreateSocketPair(int domain, int type, int protocol,
+				     SocketDescriptor &a,
+				     SocketDescriptor &b) noexcept;
+	static bool CreateSocketPairNonBlock(int domain, int type, int protocol,
+					     SocketDescriptor &a,
+					     SocketDescriptor &b) noexcept;
+#endif
+
+	int GetError() noexcept;
+
+	/**
+	 * @return the value size or 0 on error
+	 */
+	size_t GetOption(int level, int name,
+			 void *value, size_t size) const noexcept;
+
+#ifdef HAVE_STRUCT_UCRED
+	/**
+	 * Receive peer credentials (SO_PEERCRED).  On error, the pid
+	 * is -1.
+	 */
+	gcc_pure
+	struct ucred GetPeerCredentials() const noexcept;
+#endif
+
+	bool SetOption(int level, int name,
+		       const void *value, size_t size) noexcept;
+
+	bool SetBoolOption(int level, int name, bool _value) noexcept {
+		const int value = _value;
+		return SetOption(level, name, &value, sizeof(value));
+	}
+
+	bool SetKeepAlive(bool value=true) noexcept;
+	bool SetReuseAddress(bool value=true) noexcept;
+
+#ifdef __linux__
+	bool SetReusePort(bool value=true) noexcept;
+	bool SetFreeBind(bool value=true) noexcept;
+	bool SetNoDelay(bool value=true) noexcept;
+	bool SetCork(bool value=true) noexcept;
+
+	bool SetTcpDeferAccept(const int &seconds) noexcept;
+	bool SetV6Only(bool value) noexcept;
+
+	/**
+	 * Setter for SO_BINDTODEVICE.
+	 */
+	bool SetBindToDevice(const char *name) noexcept;
+
+	bool SetTcpFastOpen(int qlen=16) noexcept;
+
+	bool AddMembership(const IPv4Address &address) noexcept;
+	bool AddMembership(const IPv6Address &address) noexcept;
+	bool AddMembership(SocketAddress address) noexcept;
+#endif
+
 	bool Bind(SocketAddress address) noexcept;
 
 	/**
@@ -151,6 +216,8 @@ public:
 	 */
 	bool AutoBind() noexcept;
 #endif
+
+	bool Listen(int backlog) noexcept;
 
 	SocketDescriptor Accept() noexcept;
 
