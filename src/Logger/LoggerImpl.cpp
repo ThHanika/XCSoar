@@ -187,7 +187,7 @@ LoggerImpl::LogPoint(const NMEAInfo &gps_info)
       tmp_info.gps.satellites_used = src.satellites_used;
     }
 
-    tmp_info.gps.hdop = src.hdop;
+    tmp_info.gps.hdop = src.location.IsValid() ? src.hdop : -1;
     tmp_info.gps.real = src.real;
 
     if (src.satellite_ids_available) {
@@ -254,8 +254,8 @@ LoggerImpl::StartLogger(const NMEAInfo &gps_info,
 
   try {
     writer = new IGCWriter(filename);
-  } catch (const std::runtime_error &e) {
-    LogError(e);
+  } catch (...) {
+    LogError(std::current_exception());
     return false;
   }
 

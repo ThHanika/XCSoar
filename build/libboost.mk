@@ -1,6 +1,6 @@
-BOOST_URL = https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2
-BOOST_ALTERNATIVE_URL = https://fossies.org/linux/misc/boost_1_65_1.tar.bz2
-BOOST_MD5 = 9807a5d16566c57fd74fb522764e0b134a8bbe6b6e8967b83afefd30dcd3be81
+BOOST_URL = https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.bz2
+BOOST_ALTERNATIVE_URL = https://fossies.org/linux/misc/boost_1_70_0.tar.bz2
+BOOST_MD5 = 430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
 
 BOOST_TARBALL_NAME = $(notdir $(BOOST_URL))
 BOOST_TARBALL = $(DOWNLOAD_DIR)/$(BOOST_TARBALL_NAME)

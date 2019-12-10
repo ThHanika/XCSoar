@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_PERIOD_CLOCK_HPP
 #define XCSOAR_PERIOD_CLOCK_HPP
 
-#include "OS/Clock.hpp"
+#include <chrono>
 
 /**
  * This is a stopwatch which saves the timestamp of an event, and can
@@ -32,7 +32,9 @@ Copyright_License {
  */
 class PeriodClock {
 protected:
-  typedef unsigned Stamp;
+  using Clock = std::chrono::steady_clock;
+  using Duration = Clock::duration;
+  using Stamp = Clock::time_point;
 
 private:
   Stamp last;
@@ -45,21 +47,23 @@ public:
    * object.
    */
   constexpr
-  PeriodClock():last(0) {}
+  PeriodClock() = default;
 
 protected:
-  static Stamp GetNow() {
-    return MonotonicClockMS();
+  static auto GetNow() {
+    return std::chrono::steady_clock::now();
   }
 
-  constexpr int Elapsed(Stamp now) const {
-    return last == 0
-      ? -1
-      : now - last;
+  constexpr auto Elapsed(Stamp now) const {
+    return last > Stamp()
+      ? now - last
+      : Duration(-1);
   }
 
-  constexpr bool Check(Stamp now, unsigned duration) const {
-    return now >= last + duration;
+  template<class Rep, class Period>
+  constexpr bool Check(Stamp now,
+                       const std::chrono::duration<Rep,Period> &duration) const noexcept {
+    return now >= last + Import(duration);
   }
 
   void Update(Stamp now) {
@@ -68,30 +72,30 @@ protected:
 
 public:
   constexpr bool IsDefined() const {
-    return last != 0;
+    return last > Stamp{};
   }
 
   /**
    * Resets the clock.
    */
   void Reset() {
-    last = 0;
+    last = Stamp{};
   }
 
   /**
    * Returns the number of milliseconds elapsed since the last
    * update().  Returns -1 if update() was never called.
    */
-  int Elapsed() const {
+  auto Elapsed() const {
     return Elapsed(GetNow());
   }
 
   /**
    * Combines a call to Elapsed() and Update().
    */
-  int ElapsedUpdate() {
+  auto ElapsedUpdate() {
     const auto now = GetNow();
-    int result = Elapsed(now);
+    auto result = Elapsed(now);
     Update(now);
     return result;
   }
@@ -102,7 +106,8 @@ public:
    *
    * @param duration the duration in milliseconds
    */
-  bool Check(unsigned duration) const {
+  template<class Rep, class Period>
+  bool Check(const std::chrono::duration<Rep,Period> &duration) const noexcept {
     return Check(GetNow(), duration);
   }
 
@@ -117,8 +122,9 @@ public:
    * Updates the time stamp, setting it to the current clock plus the
    * specified offset.
    */
-  void UpdateWithOffset(int offset) {
-    Update(GetNow() + offset);
+  template<class Rep, class Period>
+  constexpr void UpdateWithOffset(const std::chrono::duration<Rep,Period> &offset) noexcept {
+    Update(GetNow() + Import(offset));
   }
 
   /**
@@ -127,7 +133,8 @@ public:
    *
    * @param duration the duration in milliseconds
    */
-  bool CheckUpdate(unsigned duration) {
+  template<class Rep, class Period>
+  bool CheckUpdate(const std::chrono::duration<Rep,Period> &duration) noexcept {
     Stamp now = GetNow();
     if (Check(now, duration)) {
       Update(now);
@@ -142,11 +149,18 @@ public:
    *
    * @param duration the duration in milliseconds
    */
-  bool CheckAlwaysUpdate(unsigned duration) {
+  template<class Rep, class Period>
+  bool CheckAlwaysUpdate(const std::chrono::duration<Rep,Period> &duration) noexcept {
     Stamp now = GetNow();
     bool ret = Check(now, duration);
     Update(now);
     return ret;
+  }
+
+protected:
+  template<class Rep, class Period>
+  static auto Import(const std::chrono::duration<Rep,Period> &duration) noexcept {
+    return std::chrono::duration_cast<Duration>(duration);
   }
 };
 

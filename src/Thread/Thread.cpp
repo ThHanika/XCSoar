@@ -37,27 +37,14 @@ Copyright_License {
 #include <signal.h>
 #endif
 
-#ifndef NDEBUG
-#include "FastMutex.hpp"
-static FastMutex all_threads_mutex;
-
-/**
- * This list keeps track of all active threads.  It is used to assert
- * that all threads have been cleaned up on shutdown.
- */
-static boost::intrusive::list<Thread,
-                              boost::intrusive::member_hook<Thread, Thread::SiblingsHook, &Thread::siblings>,
-                              boost::intrusive::constant_time_size<false>> all_threads;
-#endif
-
 void
-Thread::SetIdlePriority()
+Thread::SetIdlePriority() noexcept
 {
   ::SetThreadIdlePriority();
 }
 
 bool
-Thread::Start()
+Thread::Start() noexcept
 {
   assert(!IsDefined());
 
@@ -89,19 +76,11 @@ Thread::Start()
   bool success = handle != nullptr;
 #endif
 
-#ifndef NDEBUG
-  if (success) {
-    all_threads_mutex.lock();
-    all_threads.push_back(*this);
-    all_threads_mutex.unlock();
-  }
-#endif
-
   return success;
 }
 
 void
-Thread::Join()
+Thread::Join() noexcept
 {
   assert(IsDefined());
   assert(!IsInside());
@@ -114,17 +93,11 @@ Thread::Join()
   ::CloseHandle(handle);
   handle = nullptr;
 #endif
-
-#ifndef NDEBUG
-  all_threads_mutex.lock();
-  all_threads.erase(all_threads.iterator_to(*this));
-  all_threads_mutex.unlock();
-#endif
 }
 
 #ifndef HAVE_POSIX
 bool
-Thread::Join(unsigned timeout_ms)
+Thread::Join(unsigned timeout_ms) noexcept
 {
   assert(IsDefined());
   assert(!IsInside());
@@ -133,14 +106,6 @@ Thread::Join(unsigned timeout_ms)
   if (result) {
     ::CloseHandle(handle);
     handle = nullptr;
-
-#ifndef NDEBUG
-    {
-      all_threads_mutex.lock();
-      all_threads.erase(all_threads.iterator_to(*this));
-      all_threads_mutex.unlock();
-    }
-#endif
   }
 
   return result;
@@ -150,7 +115,7 @@ Thread::Join(unsigned timeout_ms)
 #ifdef HAVE_POSIX
 
 void *
-Thread::ThreadProc(void *p)
+Thread::ThreadProc(void *p) noexcept
 {
   Thread *thread = (Thread *)p;
 
@@ -177,7 +142,7 @@ Thread::ThreadProc(void *p)
 #else /* !HAVE_POSIX */
 
 DWORD WINAPI
-Thread::ThreadProc(LPVOID lpParameter)
+Thread::ThreadProc(LPVOID lpParameter) noexcept
 {
   Thread *thread = (Thread *)lpParameter;
 
@@ -186,16 +151,3 @@ Thread::ThreadProc(LPVOID lpParameter)
 }
 
 #endif /* !HAVE_POSIX */
-
-#ifndef NDEBUG
-
-bool
-ExistsAnyThread()
-{
-  all_threads_mutex.lock();
-  bool result = !all_threads.empty();
-  all_threads_mutex.unlock();
-  return result;
-}
-
-#endif

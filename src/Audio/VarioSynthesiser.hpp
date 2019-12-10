@@ -25,8 +25,8 @@ Copyright_License {
 #define XCSOAR_AUDIO_VARIO_SYNTHESISER_HPP
 
 #include "ToneSynthesiser.hpp"
-#include "Thread/Mutex.hpp"
-#include "Compiler.h"
+#include "Thread/Mutex.hxx"
+#include "Util/Compiler.h"
 
 /**
  * This class generates vario sound.

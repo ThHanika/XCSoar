@@ -34,7 +34,7 @@
 #include "PageActions.hpp"
 #include "Look/Look.hpp"
 #include "Profile/Profile.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "FLARM/Friends.hpp"
 #include "Look/FlarmTrafficLook.hpp"
 #include "Gauge/FlarmTrafficWindow.hpp"
@@ -944,7 +944,7 @@ TrafficWidget::SetFocus()
 }
 
 void
-TrafficWidget::OnAction(int id)
+TrafficWidget::OnAction(int id) noexcept
 {
   switch ((Action)id) {
   case CLOSE:

@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_TIMEOUT_CLOCK_HPP
 
 #include "PeriodClock.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <algorithm>
 
@@ -34,13 +34,14 @@ Copyright_License {
  */
 class TimeoutClock : private PeriodClock {
 public:
-  explicit TimeoutClock(unsigned max_duration_ms) {
-    UpdateWithOffset(max_duration_ms);
+  template<class Rep, class Period>
+  explicit TimeoutClock(const std::chrono::duration<Rep,Period> &max_duration) noexcept {
+    UpdateWithOffset(max_duration);
   }
 
   gcc_pure
   bool HasExpired() const {
-    return Elapsed() > 0;
+    return Elapsed() > Duration::zero();
   }
 
   /**
@@ -49,7 +50,7 @@ public:
    * negative.
    */
   gcc_pure
-  int GetRemainingSigned() const {
+  std::chrono::steady_clock::duration GetRemainingSigned() const {
     return -Elapsed();
   }
 
@@ -59,8 +60,9 @@ public:
    * 0.
    */
   gcc_pure
-  unsigned GetRemainingOrZero() const {
-    return std::max(GetRemainingSigned(), 0);
+  std::chrono::steady_clock::duration GetRemainingOrZero() const {
+    return std::max(GetRemainingSigned(),
+                    std::chrono::steady_clock::duration::zero());
   }
 };
 

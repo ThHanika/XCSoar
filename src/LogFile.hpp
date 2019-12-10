@@ -24,15 +24,13 @@ Copyright_License {
 #ifndef XCSOAR_LOG_FILE_HPP
 #define XCSOAR_LOG_FILE_HPP
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
+
+#include <exception>
 
 #ifdef _UNICODE
 #include <tchar.h>
 #endif
-
-namespace std {
-  class exception;
-}
 
 /**
  * Write a formatted line to the log file.
@@ -42,11 +40,11 @@ namespace std {
  */
 gcc_printf(1, 2)
 void
-LogFormat(const char *fmt, ...);
+LogFormat(const char *fmt, ...) noexcept;
 
 #ifdef _UNICODE
 void
-LogFormat(const TCHAR *fmt, ...);
+LogFormat(const TCHAR *fmt, ...) noexcept;
 #endif
 
 #if !defined(NDEBUG)
@@ -62,9 +60,9 @@ LogFormat(const TCHAR *fmt, ...);
 #endif /* NDEBUG */
 
 void
-LogError(const std::exception &exception);
+LogError(std::exception_ptr e) noexcept;
 
 void
-LogError(const char *msg, const std::exception &exception);
+LogError(std::exception_ptr e, const char *msg) noexcept;
 
 #endif

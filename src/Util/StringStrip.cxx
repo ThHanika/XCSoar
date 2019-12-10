@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 Max Kellermann <max.kellermann@gmail.com>
+ * Copyright 2009-2018 Max Kellermann <max.kellermann@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,50 +27,59 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef THREAD_POSIX_MUTEX_HXX
-#define THREAD_POSIX_MUTEX_HXX
+#include "StringStrip.hxx"
+#include "CharUtil.hxx"
 
-#include <pthread.h>
+#include <string.h>
 
-/**
- * Low-level wrapper for a pthread_mutex_t.
- */
-class PosixMutex {
-	friend class PosixCond;
+const char *
+StripLeft(const char *p) noexcept
+{
+	while (IsWhitespaceNotNull(*p))
+		++p;
 
-	pthread_mutex_t mutex;
+	return p;
+}
 
-public:
-#ifdef __GLIBC__
-	/* optimized constexpr constructor for pthread implementations
-	   that support it */
-	constexpr PosixMutex():mutex(PTHREAD_MUTEX_INITIALIZER) {}
-#else
-	/* slow fallback for pthread implementations that are not
-	   compatible with "constexpr" */
-	PosixMutex() {
-		pthread_mutex_init(&mutex, nullptr);
-	}
+const char *
+StripLeft(const char *p, const char *end) noexcept
+{
+	while (p < end && IsWhitespaceOrNull(*p))
+		++p;
 
-	~PosixMutex() {
-		pthread_mutex_destroy(&mutex);
-	}
-#endif
+	return p;
+}
 
-	PosixMutex(const PosixMutex &other) = delete;
-	PosixMutex &operator=(const PosixMutex &other) = delete;
+const char *
+StripRight(const char *p, const char *end) noexcept
+{
+	while (end > p && IsWhitespaceOrNull(end[-1]))
+		--end;
 
-	void lock() {
-		pthread_mutex_lock(&mutex);
-	}
+	return end;
+}
 
-	bool try_lock() {
-		return pthread_mutex_trylock(&mutex) == 0;
-	}
+size_t
+StripRight(const char *p, size_t length) noexcept
+{
+	while (length > 0 && IsWhitespaceOrNull(p[length - 1]))
+		--length;
 
-	void unlock() {
-		pthread_mutex_unlock(&mutex);
-	}
-};
+	return length;
+}
 
-#endif
+void
+StripRight(char *p) noexcept
+{
+	size_t old_length = strlen(p);
+	size_t new_length = StripRight(p, old_length);
+	p[new_length] = 0;
+}
+
+char *
+Strip(char *p) noexcept
+{
+	p = StripLeft(p);
+	StripRight(p);
+	return p;
+}

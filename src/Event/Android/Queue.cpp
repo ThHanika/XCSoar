@@ -22,27 +22,22 @@ Copyright_License {
 */
 
 #include "Queue.hpp"
-#include "OS/Clock.hpp"
-
-EventQueue::EventQueue()
- :now_us(MonotonicClockUS()),
-  quit(false) {}
 
 void
 EventQueue::Push(const Event &event)
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   if (quit)
     return;
 
   events.push(event);
-  cond.signal();
+  cond.notify_one();
 }
 
 bool
 EventQueue::Pop(Event &event)
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   if (quit || events.empty())
     return false;
 
@@ -54,7 +49,7 @@ EventQueue::Pop(Event &event)
 bool
 EventQueue::Generate(Event &event)
 {
-  Timer *timer = timers.Pop(now_us);
+  Timer *timer = timers.Pop(SteadyNow());
   if (timer != nullptr) {
     event.type = Event::TIMER;
     event.ptr = timer;
@@ -67,24 +62,24 @@ EventQueue::Generate(Event &event)
 bool
 EventQueue::Wait(Event &event)
 {
-  ScopeLock protect(mutex);
+  std::unique_lock<Mutex> lock(mutex);
   if (quit)
     return false;
 
   if (events.empty())
-    now_us = MonotonicClockUS();
+    FlushClockCaches();
 
   while (events.empty()) {
     if (Generate(event))
       return true;
 
-    const int64_t timeout_us = timers.GetTimeoutUS(now_us);
-    if (timeout_us < 0)
-      cond.wait(mutex);
+    const auto timeout = timers.GetTimeout(SteadyNow());
+    if (timeout < std::chrono::steady_clock::duration::zero())
+      cond.wait(lock);
     else
-      cond.timed_wait(mutex, (timeout_us + 999) / 1000);
+      cond.wait_for(lock, timeout);
 
-    now_us = MonotonicClockUS();
+    FlushClockCaches();
   }
 
   event = events.front();
@@ -95,7 +90,7 @@ EventQueue::Wait(Event &event)
 void
 EventQueue::Purge(bool (*match)(const Event &event, void *ctx), void *ctx)
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
   size_t n = events.size();
   while (n-- > 0) {
     if (!match(events.front(), ctx))
@@ -145,18 +140,19 @@ EventQueue::Purge(Window &window)
 }
 
 void
-EventQueue::AddTimer(Timer &timer, unsigned ms)
+EventQueue::AddTimer(Timer &timer, std::chrono::steady_clock::duration d) noexcept
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
 
-  timers.Add(timer, MonotonicClockUS() + ms * 1000);
-  cond.signal();
+  timers.Add(timer, SteadyNow() + d);
+
+  cond.notify_one();
 }
 
 void
 EventQueue::CancelTimer(Timer &timer)
 {
-  ScopeLock protect(mutex);
+  std::lock_guard<Mutex> lock(mutex);
 
   timers.Cancel(timer);
 }

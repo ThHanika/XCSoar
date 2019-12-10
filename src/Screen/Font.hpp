@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_SCREEN_FONT_HPP
 
 #include "Screen/Point.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #if defined(USE_APPKIT) || defined(USE_UIKIT)
 #import <Foundation/Foundation.h>
@@ -35,7 +35,7 @@ Copyright_License {
 typedef struct FT_FaceRec_ *FT_Face;
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 

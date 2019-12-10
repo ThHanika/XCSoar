@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2017 Max Kellermann <max.kellermann@gmail.com>
+ * Copyright 2012-2019 Max Kellermann <max.kellermann@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,6 +28,9 @@
  */
 
 #include "StaticSocketAddress.hxx"
+#include "IPv4Address.hxx"
+#include "IPv6Address.hxx"
+#include "Util/StringView.hxx"
 
 #include <algorithm>
 
@@ -48,6 +51,16 @@ StaticSocketAddress::operator=(SocketAddress other) noexcept
 	return *this;
 }
 
+#ifdef HAVE_UN
+
+StringView
+StaticSocketAddress::GetLocalRaw() const noexcept
+{
+	return SocketAddress(*this).GetLocalRaw();
+}
+
+#endif
+
 #ifdef HAVE_TCP
 
 bool
@@ -56,15 +69,15 @@ StaticSocketAddress::SetPort(unsigned port) noexcept
 	switch (GetFamily()) {
 	case AF_INET:
 		{
-			auto &a = (struct sockaddr_in &)address;
-			a.sin_port = htons(port);
+			auto &a = *(IPv4Address *)(void *)&address;
+			a.SetPort(port);
 			return true;
 		}
 
 	case AF_INET6:
 		{
-			auto &a = (struct sockaddr_in6 &)address;
-			a.sin6_port = htons(port);
+			auto &a = *(IPv6Address *)(void *)&address;
+			a.SetPort(port);
 			return true;
 		}
 	}

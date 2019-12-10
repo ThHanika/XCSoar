@@ -44,7 +44,7 @@ Copyright_License {
 #include "Task/ObservationZones/KeyholeZone.hpp"
 #include "Task/TypeStrings.hpp"
 #include "Gauge/TaskView.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "UIGlobals.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/DialogLook.hpp"
@@ -189,7 +189,7 @@ private:
   void OnModified(ObservationZoneEditWidget &widget) override;
 
   /* virtual methods from class ActionListener */
-  void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 };
 
 TaskPointWidget::Layout::Layout(PixelRect rc, const DialogLook &look)
@@ -300,7 +300,7 @@ TaskPointWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 }
 
 void
-TaskPointWidget::OnAction(int id)
+TaskPointWidget::OnAction(int id) noexcept
 {
     switch (id) {
     case PREVIOUS:

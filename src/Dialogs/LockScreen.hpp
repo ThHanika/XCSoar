@@ -21,21 +21,10 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_THREAD_FAST_MUTEX_HXX
-#define XCSOAR_THREAD_FAST_MUTEX_HXX
+#ifndef XCSOAR_DIALOGS_LOCKSCREEN_HPP
+#define XCSOAR_DIALOGS_LOCKSCREEN_HPP
 
-#ifdef HAVE_POSIX
-
-#include "Thread/PosixMutex.hxx"
-
-class FastMutex : public PosixMutex {
-};
-
-#else
-
-#include "Thread/CriticalSection.hxx"
-typedef CriticalSection FastMutex;
-
-#endif
+void
+ShowLockBox();
 
 #endif

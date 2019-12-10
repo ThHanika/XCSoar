@@ -35,7 +35,7 @@ Copyright_License {
 #endif
 
 #ifdef ANDROID
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Thread/Cond.hxx"
 
 struct Event;
@@ -141,6 +141,9 @@ class TopWindow : public ContainerWindow {
   struct wl_egl_window *native_window;
 #elif defined(ENABLE_SDL)
   SDL_Window *window;
+#endif
+#ifdef DRAW_MOUSE_CURSOR
+  uint8_t cursor_size = 1;
 #endif
 
 #ifndef USE_WINUSER
@@ -335,6 +338,13 @@ public:
 #ifdef SOFTWARE_ROTATE_DISPLAY
   void SetDisplayOrientation(DisplayOrientation orientation);
 #endif
+
+#ifdef DRAW_MOUSE_CURSOR
+  void SetCursorSize(const uint8_t &cursorSize) {
+    cursor_size = cursorSize;
+  }
+#endif
+
 
 protected:
   PixelPoint PointToReal(PixelPoint p) const {

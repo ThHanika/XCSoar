@@ -26,7 +26,7 @@ Copyright_License {
 #include <assert.h>
 
 bool
-SuspensibleThread::Start(bool _suspended)
+SuspensibleThread::Start(bool _suspended) noexcept
 {
   stop_received = false;
   suspend_received = _suspended;
@@ -36,66 +36,66 @@ SuspensibleThread::Start(bool _suspended)
 }
 
 void
-SuspensibleThread::BeginStop()
+SuspensibleThread::BeginStop() noexcept
 {
   assert(!Thread::IsInside());
 
-  const ScopeLock lock(mutex);
+  const std::lock_guard<Mutex> lock(mutex);
   _BeginStop();
 }
 
 void
-SuspensibleThread::_BeginStop()
+SuspensibleThread::_BeginStop() noexcept
 {
   assert(!Thread::IsInside());
 
   stop_received = true;
-  command_trigger.signal();
+  command_trigger.notify_one();
 }
 
 void
-SuspensibleThread::BeginSuspend()
+SuspensibleThread::BeginSuspend() noexcept
 {
   assert(!Thread::IsInside());
   assert(Thread::IsDefined());
 
-  const ScopeLock lock(mutex);
+  const std::lock_guard<Mutex> lock(mutex);
   _BeginSuspend();
 }
 
 void
-SuspensibleThread::_BeginSuspend()
+SuspensibleThread::_BeginSuspend() noexcept
 {
   assert(!Thread::IsInside());
   assert(Thread::IsDefined());
 
   suspend_received = true;
-  command_trigger.signal();
+  command_trigger.notify_one();
 }
 
 void
-SuspensibleThread::WaitUntilSuspended()
+SuspensibleThread::WaitUntilSuspended() noexcept
 {
   assert(!Thread::IsInside());
   assert(Thread::IsDefined());
 
-  const ScopeLock lock(mutex);
-  _WaitUntilSuspended();
+  std::unique_lock<Mutex> lock(mutex);
+  _WaitUntilSuspended(lock);
 }
 
 void
-SuspensibleThread::_WaitUntilSuspended()
+SuspensibleThread::_WaitUntilSuspended(std::unique_lock<Mutex> &lock) noexcept
 {
   assert(!Thread::IsInside());
   assert(Thread::IsDefined());
   assert(suspend_received);
 
   while (!suspended)
-    client_trigger.wait(mutex);
+    client_trigger.wait(lock);
 }
 
 void
-SuspensibleThread::Suspend()
+SuspensibleThread::Suspend() noexcept
 {
   assert(!Thread::IsInside());
 
@@ -104,46 +104,44 @@ SuspensibleThread::Suspend()
 }
 
 void
-SuspensibleThread::Resume()
+SuspensibleThread::Resume() noexcept
 {
   assert(!Thread::IsInside());
 
-  const ScopeLock lock(mutex);
+  const std::lock_guard<Mutex> lock(mutex);
   suspend_received = false;
-  command_trigger.signal();
+  command_trigger.notify_one();
 }
 
 bool
-SuspensibleThread::_IsCommandPending() const
+SuspensibleThread::_IsCommandPending() const noexcept
 {
   assert(Thread::IsInside());
-  assert(mutex.IsLockedByCurrent());
 
   return stop_received || suspend_received;
 }
 
 bool
-SuspensibleThread::IsCommandPending()
+SuspensibleThread::IsCommandPending() noexcept
 {
   assert(Thread::IsInside());
 
-  const ScopeLock lock(mutex);
+  const std::lock_guard<Mutex> lock(mutex);
   return _IsCommandPending();
 }
 
 bool
-SuspensibleThread::_CheckStoppedOrSuspended()
+SuspensibleThread::_CheckStoppedOrSuspended(std::unique_lock<Mutex> &lock) noexcept
 {
   assert(Thread::IsInside());
-  assert(mutex.IsLockedByCurrent());
 
   assert(!suspended);
 
   if (!stop_received && suspend_received) {
     suspended = true;
-    client_trigger.signal();
+    client_trigger.notify_one();
     while (!stop_received && suspend_received)
-      command_trigger.wait(mutex);
+      command_trigger.wait(lock);
     suspended = false;
   }
 
@@ -151,30 +149,30 @@ SuspensibleThread::_CheckStoppedOrSuspended()
 }
 
 bool
-SuspensibleThread::CheckStoppedOrSuspended()
+SuspensibleThread::CheckStoppedOrSuspended() noexcept
 {
   assert(Thread::IsInside());
 
-  const ScopeLock lock(mutex);
-  return _CheckStoppedOrSuspended();
+  std::unique_lock<Mutex> lock(mutex);
+  return _CheckStoppedOrSuspended(lock);
 }
 
 bool
-SuspensibleThread::_WaitForStopped(unsigned timeout_ms)
+SuspensibleThread::_WaitForStopped(std::unique_lock<Mutex> &lock,
+                                   std::chrono::steady_clock::duration timeout) noexcept
 {
   assert(Thread::IsInside());
-  assert(mutex.IsLockedByCurrent());
 
   assert(!suspended);
   suspended = true;
 
   if (!stop_received)
-    command_trigger.timed_wait(mutex, timeout_ms);
+    command_trigger.wait_for(lock, timeout);
 
   if (!stop_received && suspend_received) {
-    client_trigger.signal();
+    client_trigger.notify_one();
     while (!stop_received && suspend_received)
-      command_trigger.wait(mutex);
+      command_trigger.wait(lock);
   }
 
   suspended = false;
@@ -182,10 +180,10 @@ SuspensibleThread::_WaitForStopped(unsigned timeout_ms)
 }
 
 bool
-SuspensibleThread::WaitForStopped(unsigned timeout_ms)
+SuspensibleThread::WaitForStopped(std::chrono::steady_clock::duration timeout) noexcept
 {
   assert(Thread::IsInside());
 
-  const ScopeLock lock(mutex);
-  return _WaitForStopped(timeout_ms);
+  std::unique_lock<Mutex> lock(mutex);
+  return _WaitForStopped(lock, timeout);
 }

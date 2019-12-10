@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_FAI_TRIANGLE_RULES_HPP
 #define XCSOAR_FAI_TRIANGLE_RULES_HPP
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 struct GeoPoint;
 struct FAITriangleSettings;
@@ -74,7 +74,7 @@ namespace FAITriangleRules
    */
   static constexpr double LARGE_MAX_LEG(0.45);
 
-  static constexpr inline double LargeMinLeg(double total) {
+  static constexpr double LargeMinLeg(double total) {
     return total / 4.;
   }
 

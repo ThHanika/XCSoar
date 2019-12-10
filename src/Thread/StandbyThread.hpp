@@ -24,9 +24,9 @@ Copyright_License {
 #ifndef XCSOAR_THREAD_STANDBY_THREAD_HPP
 #define XCSOAR_THREAD_STANDBY_THREAD_HPP
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Thread/Thread.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Cond.hxx"
 
 /**
@@ -77,15 +77,11 @@ public:
 
 private:
   void TriggerCommand() {
-    assert(mutex.IsLockedByCurrent());
-
-    cond.signal();
+    cond.notify_one();
   }
 
   void TriggerDone() {
-    assert(mutex.IsLockedByCurrent());
-
-    cond.signal();
+    cond.notify_one();
   }
 
 protected:
@@ -107,7 +103,7 @@ protected:
    * Caller must not lock the mutex.
    */
   void LockTrigger() {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     Trigger();
   }
 
@@ -118,8 +114,6 @@ protected:
    */
   gcc_pure
   bool IsBusy() const {
-    assert(mutex.IsLockedByCurrent());
-
     return pending || busy;
   }
 
@@ -131,8 +125,6 @@ protected:
    */
   gcc_pure
   bool IsStopped() const {
-    assert(mutex.IsLockedByCurrent());
-
     return stop;
   }
 
@@ -148,7 +140,7 @@ protected:
    *
    * Caller must lock the mutex.
    */
-  void WaitDone();
+  void WaitDone(std::unique_lock<Mutex> &lock) noexcept;
 
   /**
    * Same as WaitDone(), but automatically lock and unlock the mutex.
@@ -156,8 +148,8 @@ protected:
    * Caller must not lock the mutex.
    */
   void LockWaitDone() {
-    ScopeLock protect(mutex);
-    WaitDone();
+    std::unique_lock<Mutex> lock(mutex);
+    WaitDone(lock);
   }
 
   /**
@@ -173,14 +165,12 @@ protected:
    * Caller must lock the mutex.
    */
   void Stop() {
-    assert(mutex.IsLockedByCurrent());
-
     StopAsync();
     WaitStopped();
   }
 
   void LockStop() {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     Stop();
   }
 
@@ -189,10 +179,10 @@ protected:
    * but you should unlock it while doing real work (and re-lock it
    * before returning), or the calling thread will block.
    */
-  virtual void Tick() = 0;
+  virtual void Tick() noexcept = 0;
 
 private:
-  virtual void Run();
+  void Run() noexcept override;
 };
 
 #endif

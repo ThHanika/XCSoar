@@ -25,17 +25,17 @@ Copyright_License {
 #define XCSOAR_EVENT_WINDOWS_QUEUE_HPP
 
 #include "../Shared/TimerQueue.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
+#include "Time/ClockCache.hxx"
+
+#include <chrono>
 
 #include <windows.h>
 
 struct Event;
 
 class EventQueue {
-  /**
-   * The current time after the event thread returned from sleeping.
-   */
-  uint64_t now_us;
+  ClockCache<std::chrono::steady_clock> steady_clock_cache;
 
   HANDLE trigger;
 
@@ -49,6 +49,17 @@ public:
     ::CloseHandle(trigger);
   }
 
+  /**
+   * Caching wrapper for std::chrono::steady_clock::now().  The
+   * real clock is queried at most once per event loop
+   * iteration, because it is assumed that the event loop runs
+   * for a negligible duration.
+   */
+  gcc_pure
+  const auto &SteadyNow() const noexcept {
+    return steady_clock_cache.now();
+  }
+
   bool Wait(Event &event);
 
 private:
@@ -57,13 +68,18 @@ private:
   }
 
 public:
-  void AddTimer(Timer &timer, unsigned ms);
+  void AddTimer(Timer &timer, std::chrono::steady_clock::duration d) noexcept;
   void CancelTimer(Timer &timer);
 
   /**
    * Handle all pending repaint messages.
    */
   static void HandlePaintMessages();
+
+private:
+  void FlushClockCaches() noexcept {
+    steady_clock_cache.flush();
+  }
 };
 
 #endif

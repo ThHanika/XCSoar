@@ -102,7 +102,7 @@ public:
     ListWidget::Show(rc);
 
     visible = true;
-    Schedule(0);
+    Schedule({});
   }
 
   virtual void Hide() override {
@@ -132,7 +132,7 @@ public:
 
   /* virtual methods from class ActionListener */
 
-  virtual void OnAction(int id) override {
+  void OnAction(int id) noexcept override {
     HelpDialog(caption, help_text);
   }
 
@@ -200,7 +200,7 @@ ListPicker(const TCHAR *caption,
       list_widget->GetList().Invalidate();
     });
   if (update)
-    update_timer.Schedule(1000);
+    update_timer.Schedule(std::chrono::seconds(1));
 
   int result = dialog.ShowModal();
   if (result == mrOK)

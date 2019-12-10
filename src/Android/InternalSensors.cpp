@@ -31,7 +31,7 @@ Copyright_License {
 #include "Math/SelfTimingKalmanFilter1d.hpp"
 #include "OS/Clock.hpp"
 #include "Geo/Geoid.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 Java::TrivialClass InternalSensors::gps_cls, InternalSensors::sensors_cls;
 jmethodID InternalSensors::gps_ctor_id, InternalSensors::close_method;
@@ -146,6 +146,7 @@ InternalSensors::create(JNIEnv *env, Context *context, unsigned int index)
   // Construct InternalGPS object.
   jobject gps_obj =
     env->NewObject(gps_cls, gps_ctor_id, context->Get(), index);
+  Java::RethrowException(env);
   assert(gps_obj != nullptr);
 
   // Construct NonGPSSensors object.
@@ -196,7 +197,7 @@ Java_org_xcsoar_InternalGPS_setConnected(JNIEnv *env, jobject obj,
 {
   unsigned index = getDeviceIndex(env, obj);
 
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
   NMEAInfo &basic = device_blackboard->SetRealState(index);
 
   switch (connected) {
@@ -233,7 +234,7 @@ Java_org_xcsoar_InternalGPS_setLocation(JNIEnv *env, jobject obj,
 {
   unsigned index = getDeviceIndex(env, obj);
 
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
   NMEAInfo &basic = device_blackboard->SetRealState(index);
   basic.UpdateClock();
   basic.alive.Update(basic.clock);
@@ -280,8 +281,7 @@ Java_org_xcsoar_InternalGPS_setLocation(JNIEnv *env, jobject obj,
     basic.ground_speed_available.Update(basic.clock);
   }
 
-  if (hasAccuracy)
-    basic.gps.hdop = accuracy;
+  basic.gps.hdop = hasAccuracy ? accuracy : -1;
 
   if (hasAcceleration)
     basic.acceleration.ProvideGLoad(acceleration, true);
@@ -300,7 +300,7 @@ Java_org_xcsoar_NonGPSSensors_setAcceleration(JNIEnv *env, jobject obj,
   // TODO
   /*
   const unsigned int index = getDeviceIndex(env, obj);
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
   NMEAInfo &basic = device_blackboard->SetRealState(index);
   */
 }
@@ -314,7 +314,7 @@ Java_org_xcsoar_NonGPSSensors_setRotation(JNIEnv *env, jobject obj,
   // TODO
   /*
   const unsigned int index = getDeviceIndex(env, obj);
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
   NMEAInfo &basic = device_blackboard->SetRealState(index);
   */
 }
@@ -328,7 +328,7 @@ Java_org_xcsoar_NonGPSSensors_setMagneticField(JNIEnv *env, jobject obj,
   // TODO
   /*
   const unsigned int index = getDeviceIndex(env, obj);
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
   NMEAInfo &basic = device_blackboard->SetRealState(index);
   */
 }
@@ -381,7 +381,7 @@ Java_org_xcsoar_NonGPSSensors_setBarometricPressure(JNIEnv *env, jobject obj,
   static SelfTimingKalmanFilter1d kalman_filter(KF_MAX_DT, KF_VAR_ACCEL);
 
   const unsigned int index = getDeviceIndex(env, obj);
-  ScopeLock protect(device_blackboard->mutex);
+  std::lock_guard<Mutex> lock(device_blackboard->mutex);
 
   /* Kalman filter updates are also protected by the blackboard
      mutex. These should not take long; we won't hog the mutex

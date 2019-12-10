@@ -36,7 +36,6 @@ void
 StandbyThread::Trigger()
 {
   assert(!IsInside());
-  assert(mutex.IsLockedByCurrent());
 
   stop = false;
   pending = true;
@@ -52,7 +51,6 @@ void
 StandbyThread::StopAsync()
 {
   assert(!IsInside());
-  assert(mutex.IsLockedByCurrent());
 
   stop = true;
 
@@ -63,20 +61,17 @@ StandbyThread::StopAsync()
 }
 
 void
-StandbyThread::WaitDone()
+StandbyThread::WaitDone(std::unique_lock<Mutex> &lock) noexcept
 {
   assert(!IsInside());
-  assert(mutex.IsLockedByCurrent());
 
-  while (alive && IsBusy())
-    cond.wait(mutex);
+  cond.wait(lock, [this]{ return !alive || !IsBusy(); });
 }
 
 void
 StandbyThread::WaitStopped()
 {
   assert(!IsInside());
-  assert(mutex.IsLockedByCurrent());
   assert(stop);
 
   if (!IsDefined())
@@ -89,12 +84,11 @@ StandbyThread::WaitStopped()
 }
 
 void
-StandbyThread::Run()
+StandbyThread::Run() noexcept
 {
-  assert(!mutex.IsLockedByCurrent());
   assert(!busy);
 
-  const ScopeLock lock(mutex);
+  std::unique_lock<Mutex> lock(mutex);
 
   alive = true;
 
@@ -103,7 +97,7 @@ StandbyThread::Run()
 
     if (!pending) {
       /* wait for a command */
-      cond.wait(mutex);
+      cond.wait(lock);
     }
 
     assert(!busy);

@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "Util/Serial.hpp"
 #include "Time/TimeoutClock.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Thread/Cond.hxx"
 #include "Operation/Operation.hpp"
 
@@ -45,6 +45,7 @@ Copyright_License {
 template<typename V>
 class DeviceSettingsMap {
   Mutex mutex;
+
   Cond cond;
 
   struct Item {
@@ -83,14 +84,6 @@ public:
     }
   };
 
-  void Lock() {
-    mutex.Lock();
-  }
-
-  void Unlock() {
-    mutex.Unlock();
-  }
-
   operator Mutex &() const {
     return const_cast<Mutex &>(mutex);
   }
@@ -103,7 +96,8 @@ public:
   }
 
   template<typename K>
-  const_iterator Wait(const K &key, OperationEnvironment &env,
+  const_iterator Wait(std::unique_lock<Mutex> &lock,
+                      const K &key, OperationEnvironment &env,
                       TimeoutClock timeout) {
     while (true) {
       auto i = map.find(key);
@@ -113,19 +107,20 @@ public:
       if (env.IsCancelled())
         return end();
 
-      int remaining = timeout.GetRemainingSigned();
-      if (remaining <= 0)
+      const auto remaining = timeout.GetRemainingSigned();
+      if (remaining.count() <= 0)
         return end();
 
-      cond.timed_wait(*this, remaining);
+      cond.wait_for(lock, remaining);
     }
   }
 
-  template<typename K>
-  const_iterator Wait(const K &key, OperationEnvironment &env,
-                      unsigned timeout_ms) {
-    TimeoutClock timeout(timeout_ms);
-    return Wait(key, env, timeout);
+  template<typename K, class Rep, class Period>
+  const_iterator Wait(std::unique_lock<Mutex> &lock,
+                      const K &key, OperationEnvironment &env,
+                      const std::chrono::duration<Rep,Period> &_timeout) {
+    TimeoutClock timeout(_timeout);
+    return Wait(lock, key, env, timeout);
   }
 
   template<typename K>
@@ -147,7 +142,7 @@ public:
     if (!i.second)
       item.value = value;
 
-    cond.broadcast();
+    cond.notify_all();
   }
 
   template<typename K>

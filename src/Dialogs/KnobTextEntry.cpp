@@ -31,9 +31,12 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Util/CharUtil.hxx"
 #include "Util/Macros.hpp"
+#include "Util/StringStrip.hxx"
 #include "Util/TruncateString.hpp"
 
 #include <algorithm>
+
+#include <string.h>
 
 enum Buttons {
   DOWN,
@@ -141,7 +144,7 @@ protected:
   void OnPaint(Canvas &canvas) override;
 
   /* virtual methods from class ActionListener */
-  void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 };
 
 void
@@ -184,7 +187,7 @@ KnobTextEntryWindow::OnPaint(Canvas &canvas)
 }
 
 void
-KnobTextEntryWindow::OnAction(int id)
+KnobTextEntryWindow::OnAction(int id) noexcept
 {
   switch (id) {
   case DOWN:

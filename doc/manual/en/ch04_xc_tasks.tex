@@ -5,7 +5,7 @@ edited prior to flight and, when undertaking casual cross-country
 flying, modified during flight.  Waypoints are advanced automatically
 or may be cycled through manually. Many of XCSoar's computations relate to
 either turnpoints or the finish waypoint.
-Unless a "true" task is defined, XCSoar will provide a "go home" function, with 
+Unless a ``true'' task is defined, XCSoar will provide a ``go home'' function, with
 many of the task related functions referring to the location of takeoff.
 This chapter also describes the use of IGC loggers with XCSoar.
 
@@ -30,13 +30,13 @@ if it was close to the takeoff point.
 Whether or not a task is defined, the takeoff point is always
 generated and appears in the waypoint list for later reference or use.
 
-After having defined an ordered task for the very first time, the automatic "goto takeoff" function is skipped. To resume a simple task, use goto.
+After having defined an ordered task for the very first time, the automatic ``goto takeoff'' function is skipped. To resume a simple task, use goto.
 
 \section{Goto tasks}
 
 Goto tasks may be established by selecting a waypoint from the map,
-the waypoint list, or any other mechanism e.g. the alternates dialogue, 
-and select \bmenuw{Goto}. In goto task mode, selecting
+the waypoint list, or any other mechanism e.g.\ the alternates dialogue,
+and select \bmenuw{GoTo}. In goto task mode, selecting
 \bmenug{Nav 2}\blink\bmenug{Task Resume} resumes the ordered task (if
 any).
 
@@ -64,12 +64,12 @@ The main ways of setting tasks are the following:
 
 %Selecting the Task menu item will produce the Task dialogue box.  The
 %list box on the left displays all of the turn points loaded into the
-%system. Highlight the desired entries and using the "-$>$" and "$<$-"
+%system. Highlight the desired entries and using the ``-$>$'' and ``$<$-''
 %buttons assemble the desired task in the Task list box. As each turn
 %point is added to the task a continuous display of the calculated task
 %length is shown.  Tasks can be saved for recalling later using the
-%"Save" button and recalled using the "Load" button.  Once the desired
-%task is complete select "OK".
+%``Save'' button and recalled using the ``Load'' button.  Once the desired
+%task is complete select ``OK''.
 %
 %{\it DIAGRAM SHOWING TASK DIALOG EDITING, WITH LABELED ARROWS POINTING
 %TO THE USER INTERFACE ELEMENTS?}
@@ -83,7 +83,7 @@ containing one waypoint takeoff as ``goto home''.
 
 XCSoar saves the current task when shutting down and loads it at
 startup, thereby allowing the task to be entered early in the day,
-then the device running XC Soar can be turned off until flight time.
+then the device running XCSoar can be turned off until flight time.
 
 Task waypoints are preserved even if the waypoint
 file is changed.  This means, if you save a task, then change the
@@ -108,7 +108,7 @@ waypoint as the new home.
 This may be accessed in several ways:
 
 \gesturespec{rd}or menu \bmenug{Nav 1/2}\blink\bmenug{Task},
-\todonum{descr. tabular "Turn Points"}
+\todonum{descr.\ tabular ``Turn Points''}
 highlight a waypoint, then tap the highlighted waypoint again to display the 
 task point dialogue, then push \bmenuw{Details}.
 
@@ -177,7 +177,7 @@ of whether a GPS fix is received.  If no home is set, then XCSoar
 starts in the centre of the terrain map.
 
 \subsection*{Airfield information}
-This page may contain relevant text from the enroute supplement about
+This page may contain relevant text from the en-route supplement about
 the airfield, including runways, radio frequencies, traffic patterns,
 contacts.
 \begin{center}
@@ -235,7 +235,7 @@ waypoint.
 
 \section{Task manager}\label{sec:task-manager-dialog}
 \begin{it}  The task manager has undergone significant redesign compared with 
-earlier versions of XC Soar.\end{it}
+earlier versions of XCSoar.\end{it}
 \gesturespec{rd}
 
 The task manager is used to edit, view, load, save to file, and declare cross
@@ -253,7 +253,7 @@ various changes to the task on final performance.
 \menulabelr{\bmenuw{Calculator}}
 
 In flight the Task Calculator might also be accessed from the Analysis pages. 
-With pages Task, Climb, and TaskSpeed a button \bmenuw{Task Calc} comes up, 
+With pages Task, Climb, and Task Speed a button \bmenuw{Task Calc} comes up,
 that directly changes to the Task Calculator screen.
 
 
@@ -290,7 +290,7 @@ unaffected.
 The \bmenuw{Target} button, for AAT tasks, adjusts the range
 (increases or decreases) so that the estimated task time exceeds the
 assigned task time by less than five minutes.  The range is adjusted
-target-wise. In typical use, all targets are set to ``auto" that means the pilot 
+target-wise. In typical use, all targets are set to ``auto'' that means the pilot
 does not have to manually adjust the range to find the course for arrival at 
 the assigned task time, thereby reducing pilot workload.
 
@@ -298,8 +298,8 @@ the assigned task time, thereby reducing pilot workload.
 This page displays an ordered list of the points in the current active task.
 \menulabelr{\bmenuw{Turn Points}} 
 If there are no waypoints in the active task, there 
-will be only an option to "Add Turnpoint."  By highlighting (tapping) the 
-"Add Turnpoint" function, then tapping in the highlighted region, the waypoint 
+will be only an option to ``Add Turnpoint.''  By highlighting (tapping) the
+``Add Turnpoint'' function, then tapping in the highlighted region, the waypoint
 selector is displayed, as described above.  Highlighting a waypoint from the 
 list and then tapping on the highlighted region adds the waypoint to the task.
 
@@ -327,10 +327,10 @@ The values in the menu depend on the task type selected. Clicking any existing
 different value for this rule.  Task types are discussed in more detail below.
 
 Also, tapping on the \bmenuw{Rules} button again after it is highlighted allows 
-toggling between a "thumbnail" view of the task map and a larger view of the task.
+toggling between a ``thumbnail'' view of the task map and a larger view of the task.
 
 \section{Task types}
-XC Soar currently defines three different task types: Racing, AAT, and FAI badges/records.
+XCSoar currently defines three different task types: Racing, AAT, and FAI badges/records.
 
 A brief description of the task types is included below, but this manual does 
 not intend to rephrase FAI rules or contest task types. The reader is encouraged 
@@ -339,7 +339,7 @@ or FAI rules, which are available at \url{http://www.fai.org}.
 
 
 \subsection*{Racing}
-(also known as an "assigned task").  The racing task involves flight 
+(also known as an ``assigned task'').  The racing task involves flight
 around each specified turnpoint in the specified order.  Selecting the racing task 
 type allows the pilot to enter the following parameters.
   \begin{description}
@@ -348,29 +348,29 @@ type allows the pilot to enter the following parameters.
   menu \bmenug{Nav 1/2}, controlling  the detection of the start condition.
   \item [Start open time] This is the time when the start zone opens.
   \item [Start close time] This is the time when the start zone closes.
-  \item [Start max. speed] This is the maximum speed allowed in the start observation 
+  \item [Start max.\ speed] This is the maximum speed allowed in the start observation
     zone.  This should be set to 0 if there is no limit.
-  \item [Start max. height] This is the maximum height above the start height 
+  \item [Start max.\ height] This is the maximum height above the start height
     reference (AGL or MSL) at which a task can be started.  This  should be set to 
     0 for no limit.
   \item [Start height ref.] This specifies whether the maximum start height is 
-    referenced to ground level of the start point ("AGL") or Mean Sea Level ("MSL").
-  \item [Finish min. height] This is the minimum height based on the finish 
+    referenced to ground level of the start point (``AGL'') or Mean Sea Level (``MSL'')
+  \item [Finish min.\ height] This is the minimum height based on the finish
     reference (AGL or MSL) at which a task can be finished.  This should be set to 
     0 for no limit.
   \item [Finish height ref.] This specifies whether the minimum finish height 
-    is referenced to ground level of the finish point ("AGL") or Mean Sea Level ("MSL")
-% \item [FAI start/finish rules] If enabled, this task type has no max. start height 
-%   or max. start speed.  Finish height reference is set to AGL and finish height 
+    is referenced to ground level of the finish point (``AGL'') or Mean Sea Level (``MSL'')
+% \item [FAI start/finish rules] If enabled, this task type has no max.\ start height
+%   or max.\ start speed.  Finish height reference is set to AGL and finish height
 %   is 1000m below the start height \todonum[inline]{Is this description correct?}
   \end{description}
   
 \subsection*{Assigned area task (AAT) and Modified area task (MAT)}
-(also known as "Turn Area Task,"or TAT).  This is a task through assigned 
+(also known as ``Turn Area Task,''or TAT).  This is a task through assigned
 areas (restricted to cylinder or sector observation zones).  A minimum task time 
 applies.  Rules options for this task type include:
   \begin{description}
-  \item [AAT min. time]  This is the required minimum time for the task.  Refer 
+  \item [AAT min.\ time]  This is the required minimum time for the task.  Refer
     to contest rules or consult an expert for penalties associated with finishing 
     prior to the minimum time.  The time in this option is given in minutes.
   \item [other rules] All other rules stay the same as in case of task type 
@@ -444,7 +444,7 @@ observation zone defined by a segment and radial distance from the
 waypoint. The segment is defined by a 180 degree arc centred about the
 bisector of inbound and outbound legs, with a distance of 10 km.
 The observation zone also includes a cylinder of 500 m (British rules).
-\item[Area Zylinder (AAT)]  and
+\item[Area Cylinder (AAT)]  and
 \item[Area Sector (AAT)]  When the glider has entered the observation zone
 defined by the radial distance from the waypoint, and segment for sector areas.
 \end{description}
@@ -577,7 +577,7 @@ The task system allows alternate start sectors to be defined:
 
 On the start point edit page of the Task Manager turn on the \bmenuw{Enable 
 Alternate Starts} property. Another screen is brought up for defining an 
-alternate start point. In case, alternate start points have been defined before, label \bmenuw{Enable Alternate Starts} changes to \bmenuw{Edit Alternates}. After selecting ``Add Alternate Start'' and touching 
+alternate start point. If alternate start points have been defined before, label \bmenuw{Enable Alternate Starts} changes to \bmenuw{Edit Alternates}. After selecting ``Add Alternate Start'' and touching
 \bmenuw{Relocate} the ``Select Waypoint'' filtering dialogue is invoked.
 
 Having set up several alternate start points, the ``next waypoint'' scheme again will be extended. Before detection of a valid start and having armed start manually, the menu buttons stepping through all the waypoints will show label \bmenug{Next Start}.
@@ -845,7 +845,7 @@ Best scored target found & Target (60\%) is on bisector \\
 \includegraphics[angle=0,width=0.45\linewidth,keepaspectratio='true']{figures/faat09.png} & 
 \includegraphics[angle=0,width=0.45\linewidth,keepaspectratio='true']{figures/faat11.png} \\
 {\em Inside sector} & {\em Next waypoint} \\
-Target (60\%) moved along track line & ``Arm Turn" pressed \\
+Target (60\%) moved along track line & ``Arm Turn'' pressed \\
 
 \midrule
 \includegraphics[angle=0,width=0.45\linewidth,keepaspectratio='true']{figures/faat12.png} &  \\
@@ -859,14 +859,14 @@ Best scored targets found &  \\
 
 \section{OnLine Contest}
 
-The analysis dialogue contains a page `OnLine Contest' which can be
+The analysis dialogue contains a page ``OnLine Contest'' which can be
 used to show the optimal path and estimated score.  The configuration settings \config{taskrules} 
 (task rules page) allows the selection of which set of rules to be used for the
 OLC optimisation.
 
 The optimization is done continuously in the background and can be retrieved at
 any time. The analysis page shows a graphical overview of the optimisation
-result besides distance and score. A InfoBox is available which gives the
+result besides distance and score. An InfoBox is available which gives the
 instant OLC distance and score as well.
 
 \begin{center}
@@ -882,7 +882,7 @@ path is shown as a thick red line.
 
 The score and computed optimal distance is approximate.
 
-When the aircraft has landed, the displayed result gets not updated anymore.
+When the aircraft has landed, the displayed result is not updated anymore.
 
 
 \section{Logger}\label{sec:logger}
@@ -899,14 +899,14 @@ Several flight loggers are accessible via XCSoar:
   For this to work, the device must be specified in the `Devices' 
   section of the configuration \config{comdevices} settings.
 \item  For some of the numerous logger devices XCSoar can download IGC files. 
-  This is convenient especially for logger devices, which are not that easy 
+  This is convenient especially for logger devices which are not that easily
   removable from the glider.
 \end{itemize}
 
 \subsection*{Setup}
-For a complete matrix of the supported logger features see section~\ref{sec:supported-varios}.  
-The configuration is described in detail in section~\ref{conf:logger}.  Details 
-to the log files can be found in section~\ref{sec:logfiles}.
+For a complete matrix of the supported logger features see Section~\ref{sec:supported-varios}.
+The configuration is described in detail in Section~\ref{conf:logger}.  Details
+to the log files can be found in Section~\ref{sec:logfiles}.
 
 \subsection*{Logger activation}
 The logger can be turned on and off automatically or manually.  For para-glider 
@@ -966,7 +966,7 @@ by changing the time scale from 1x to a higher number, and paused by
 setting the time scale to zero.  High time scales can result in degraded
 performance of the wind estimation and other statistics/analysis routines.
 
-Stop the log using the \button{Stop}.
+Stop the log by pressing \button{Stop}.
 Once a log is started, further presses of the \button{Start} has the
 effect of restarting the replay.
 

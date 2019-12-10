@@ -67,15 +67,18 @@ struct TrafficList {
   void Complement(const TrafficList &add) {
     // Add unique traffic from 'add' list
     for (auto &traffic : add.list) {
-      if (FindTraffic(traffic.id) == NULL) {
-        list.append(traffic);
+      if (FindTraffic(traffic.id) == nullptr) {
+        FlarmTraffic * new_traffic = AllocateTraffic();
+        if (new_traffic == nullptr)
+          return;
+        *new_traffic = traffic;
       }
     }
   }
 
   void Expire(double clock) {
-    modified.Expire(clock, 300);
-    new_traffic.Expire(clock, 60);
+    modified.Expire(clock, std::chrono::minutes(5));
+    new_traffic.Expire(clock, std::chrono::minutes(1));
 
     for (unsigned i = list.size(); i-- > 0;)
       if (!list[i].Refresh(clock))

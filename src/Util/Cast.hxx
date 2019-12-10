@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 Max Kellermann <max.kellermann@gmail.com>
+ * Copyright (C) 2013-2014 Max Kellermann <max.kellermann@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,60 +27,60 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef THREAD_POSIX_SHARED_MUTEX_HXX
-#define THREAD_POSIX_SHARED_MUTEX_HXX
+#ifndef CAST_HXX
+#define CAST_HXX
 
-#include <pthread.h>
+#include "OffsetPointer.hxx"
+#include "Compiler.h"
+
+#include <stddef.h>
+
+template<typename T, typename U>
+constexpr T *
+OffsetCast(U *p, ptrdiff_t offset)
+{
+	return reinterpret_cast<T *>(OffsetPointer(p, offset));
+}
+
+template<typename T, typename U>
+constexpr T *
+OffsetCast(const U *p, ptrdiff_t offset)
+{
+	return reinterpret_cast<const T *>(OffsetPointer(p, offset));
+}
+
+template<class C, class A>
+constexpr ptrdiff_t
+ContainerAttributeOffset(const C *null_c, const A C::*p)
+{
+	return ptrdiff_t((const char *)&(null_c->*p) - (const char *)null_c);
+}
+
+template<class C, class A>
+constexpr ptrdiff_t
+ContainerAttributeOffset(const A C::*p)
+{
+	return ContainerAttributeOffset<C, A>(nullptr, p);
+}
 
 /**
- * Low-level wrapper for a pthread_rwlock_t.
+ * Cast the given pointer to a struct member to its parent structure.
  */
-class PosixSharedMutex {
-	pthread_rwlock_t rwlock;
+template<class C, class A>
+constexpr C &
+ContainerCast(A &a, const A C::*member)
+{
+	return *OffsetCast<C, A>(&a, -ContainerAttributeOffset<C, A>(member));
+}
 
-public:
-#ifdef __GLIBC__
-	/* optimized constexpr constructor for pthread implementations
-	   that support it */
-	constexpr PosixSharedMutex():rwlock(PTHREAD_RWLOCK_INITIALIZER) {}
-#else
-	/* slow fallback for pthread implementations that are not
-	   compatible with "constexpr" */
-	PosixSharedMutex() {
-		pthread_rwlock_init(&rwlock, nullptr);
-	}
-
-	~PosixSharedMutex() {
-		pthread_rwlock_destroy(&rwlock);
-	}
-#endif
-
-	PosixSharedMutex(const PosixSharedMutex &other) = delete;
-	PosixSharedMutex &operator=(const PosixSharedMutex &other) = delete;
-
-	void lock() {
-		pthread_rwlock_wrlock(&rwlock);
-	}
-
-	bool try_lock() {
-		return pthread_rwlock_trywrlock(&rwlock) == 0;
-	}
-
-	void unlock() {
-		pthread_rwlock_unlock(&rwlock);
-	}
-
-	void lock_shared() {
-		pthread_rwlock_rdlock(&rwlock);
-	}
-
-	bool try_lock_shared() {
-		return pthread_rwlock_tryrdlock(&rwlock) == 0;
-	}
-
-	void unlock_shared() {
-		pthread_rwlock_unlock(&rwlock);
-	}
-};
+/**
+ * Cast the given pointer to a struct member to its parent structure.
+ */
+template<class C, class A>
+constexpr const C &
+ContainerCast(const A &a, const A C::*member)
+{
+	return *OffsetCast<const C, const A>(&a, -ContainerAttributeOffset<C, A>(member));
+}
 
 #endif

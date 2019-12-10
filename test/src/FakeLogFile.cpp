@@ -22,13 +22,14 @@ Copyright_License {
 */
 
 #include "LogFile.hpp"
+#include "Util/Exception.hxx"
 
 #include <exception>
 #include <cstdarg>
 #include <cstdio>
 
 void
-LogFormat(const char *fmt, ...)
+LogFormat(const char *fmt, ...) noexcept
 {
   va_list ap;
 
@@ -42,7 +43,7 @@ LogFormat(const char *fmt, ...)
 #ifdef _UNICODE
 
 void
-LogFormat(const TCHAR *fmt, ...)
+LogFormat(const TCHAR *fmt, ...) noexcept
 {
   va_list ap;
 
@@ -56,13 +57,13 @@ LogFormat(const TCHAR *fmt, ...)
 #endif
 
 void
-LogError(const std::exception &exception)
+LogError(std::exception_ptr e) noexcept
 {
-  LogFormat("%s", exception.what());
+  LogFormat("%s", GetFullMessage(e).c_str());
 }
 
 void
-LogError(const char *msg, const std::exception &exception)
+LogError(std::exception_ptr e, const char *msg) noexcept
 {
-  LogFormat("%s: %s", msg, exception.what());
+  LogFormat("%s: %s", msg, GetFullMessage(e).c_str());
 }

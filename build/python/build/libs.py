@@ -40,9 +40,9 @@ musl = AutotoolsProject(
 )
 
 libstdcxx_musl_headers = LibstdcxxMuslHeadersProject(
-    'https://ftp.gnu.org/gnu/gcc/gcc-6.4.0/gcc-6.4.0.tar.xz',
-    'http://mirrors.ibiblio.org/gnu/ftp/gnu/gcc/gcc-6.4.0/gcc-6.4.0.tar.xz',
-    '850bf21eafdfe5cd5f6827148184c08c4a0852a37ccf36ce69855334d2c914d4',
+    'https://ftp.gnu.org/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.xz',
+    'http://mirrors.ibiblio.org/gnu/ftp/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.xz',
+    '64baadfe6cc0f4947a84cb12d7f0dfaf45bb58b7e92461639596c21e02d97d2c',
     'include/libstdc++/algorithm',
     [
         '--enable-clocale=generic',
@@ -109,9 +109,9 @@ freetype = FreeTypeProject(
 )
 
 curl = CurlProject(
-    'http://curl.haxx.se/download/curl-7.63.0.tar.xz',
-    'https://github.com/curl/curl/releases/download/curl-7_63_0/curl-7.63.0.tar.xz',
-    '9600234c794bfb8a0d3f138e9294d60a20e7a5f10e35ece8cf518e2112d968c4',
+    'http://curl.haxx.se/download/curl-7.64.1.tar.xz',
+    'https://github.com/curl/curl/releases/download/curl-7_64_1/curl-7.64.1.tar.xz',
+    '9252332a7f871ce37bfa7f78bdd0a0e3924d8187cc27cb57c76c9474a7168fb3',
     'lib/libcurl.a',
     [
         '--disable-shared', '--enable-static',
