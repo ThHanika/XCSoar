@@ -261,6 +261,10 @@ extern const char PCMetFtpPassword[];
 
 extern const char EnableLocationMapItem[];
 extern const char EnableArrivalAltitudeMapItem[];
+extern const char EnableAirspaceMapItem[];
+extern const char EnableTrafficMapItem[];
+extern const char RangeOfNearestMapItemsInPercent[];
+extern const char RangefilterAllWaypointUpToKm[];
 
 extern const char VarioMinFrequency[];
 extern const char VarioZeroFrequency[];
