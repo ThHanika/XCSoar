@@ -1,25 +1,25 @@
 /*
- Copyright_License {
+Copyright_License {
 
- XCSoar Glide Computer - http://www.xcsoar.org/
- Copyright (C) 2000-2016 The XCSoar Project
- A detailed list of copyright holders can be found in the file "AUTHORS".
+  XCSoar Glide Computer - http://www.xcsoar.org/
+  Copyright (C) 2000-2016 The XCSoar Project
+  A detailed list of copyright holders can be found in the file "AUTHORS".
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 2
- of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+}
+*/
 
 #include "GlueMapWindow.hpp"
 #include "Items/List.hpp"
@@ -42,8 +42,9 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
                             bool show_empty_message) const
 {
   /* not using MapWindowBlackboard here because this method is called
-   by the main thread */
-  const ComputerSettings &computer_settings = CommonInterface::GetComputerSettings();
+     by the main thread */
+  const ComputerSettings &computer_settings =
+    CommonInterface::GetComputerSettings();
   const MapSettings &settings = CommonInterface::GetMapSettings();
   const MoreData &basic = CommonInterface::Basic();
   const DerivedInfo &calculated = CommonInterface::Calculated();
@@ -87,9 +88,8 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
       builder.AddLocation(basic, terrain);
 
     if (settings.item_list.add_arrival_altitude && route_planner)
-      builder.AddArrivalAltitudes(
-          *route_planner, terrain,
-          computer_settings.task.safety_height_arrival);
+      builder.AddArrivalAltitudes(*route_planner, terrain,
+                                  computer_settings.task.safety_height_arrival);
 
     if (basic.location_available)
       builder.AddSelfIfNear(basic.location, basic.attitude.heading);
