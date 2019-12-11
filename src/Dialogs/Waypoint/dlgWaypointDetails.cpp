@@ -45,7 +45,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Language/Language.hpp"
 #include "Waypoint/LastUsed.hpp"
 #include "Profile/Current.hpp"
@@ -293,7 +293,7 @@ public:
 
 private:
   /* virtual methods from class ActionListener */
-  void OnAction(int id) override {
+  void OnAction(int id) noexcept override {
     switch (id) {
     case GOTO:
       OnGotoClicked();

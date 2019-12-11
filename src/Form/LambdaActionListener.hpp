@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_FORM_LAMBDA_ACTION_LISTENER_HPP
 
 #include "ActionListener.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <utility>
 
@@ -38,7 +38,7 @@ class LambdaActionListener : public ActionListener, private C {
 public:
   LambdaActionListener(C &&c):C(std::move(c)) {}
 
-  virtual void OnAction(int id) override {
+  void OnAction(int id) noexcept override {
     C::operator()(id);
   }
 };

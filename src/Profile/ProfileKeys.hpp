@@ -126,6 +126,7 @@ extern const char AppDialogTabStyle[];
 extern const char AppDialogStyle[];
 extern const char AppInfoBoxBorder[];
 extern const char AppAveNeedle[];
+extern const char CursorSize[];
 extern const char AutoAdvance[];
 extern const char UTCOffset[];
 extern const char UTCOffsetSigned[];
@@ -238,6 +239,7 @@ extern const char SkyLinesRoaming[];
 extern const char SkyLinesTrackingInterval[];
 extern const char SkyLinesTrafficEnabled[];
 extern const char SkyLinesNearTrafficEnabled[];
+extern const char SkyLinesTrafficMapMode[];
 extern const char SkyLinesTrackingKey[];
 
 extern const char CloudEnabled[];
@@ -259,6 +261,10 @@ extern const char PCMetFtpPassword[];
 
 extern const char EnableLocationMapItem[];
 extern const char EnableArrivalAltitudeMapItem[];
+extern const char EnableAirspaceMapItem[];
+extern const char EnableTrafficMapItem[];
+extern const char RangeOfNearestMapItemsInPercent[];
+extern const char RangefilterAllWaypointUpToKm[];
 
 extern const char VarioMinFrequency[];
 extern const char VarioZeroFrequency[];

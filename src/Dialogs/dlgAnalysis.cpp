@@ -189,7 +189,7 @@ protected:
     chart.MoveAndShow(layout.main);
 
     Update();
-    Timer::Schedule(2500);
+    Timer::Schedule(std::chrono::milliseconds(2500));
   }
 
   void Hide() override {
@@ -223,7 +223,7 @@ protected:
 
 private:
   /* virtual methods from class ActionListener */
-  void OnAction(int id) override {
+  void OnAction(int id) noexcept override {
     switch (id) {
     case PREVIOUS:
       NextPage(-1);

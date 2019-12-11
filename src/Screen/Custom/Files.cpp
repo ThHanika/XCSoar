@@ -24,7 +24,7 @@ Copyright_License {
 #include "Files.hpp"
 #include "OS/FileUtil.hpp"
 #include "OS/Path.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
@@ -39,7 +39,7 @@ static const char *const font_search_paths[] = {
   "/Library/Fonts",
   "/Library/Fonts/Microsoft",
 #endif
-#elif defined(WIN32) && !defined(HAVE_POSIX)
+#elif defined(_WIN32) && !defined(HAVE_POSIX)
   /* just for the experimental WINSDL target */
   "c:\\windows\\fonts",
 #elif defined(KOBO)
@@ -67,7 +67,7 @@ static const char *const all_font_paths[] = {
   "Times New Roman.ttf",
   "Arial.ttf",
 #endif
-#elif defined(WIN32) && !defined(HAVE_POSIX)
+#elif defined(_WIN32) && !defined(HAVE_POSIX)
   /* just for the experimental WINSDL target */
   "arial.ttf",
 #else

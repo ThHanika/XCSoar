@@ -56,13 +56,13 @@ public:
    * Triggers a redraw.
    */
   void TriggerRedraw() {
-    const ScopeLock lock(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     pending = true;
-    command_trigger.signal();
+    command_trigger.notify_one();
   }
 
 protected:
-  virtual void Run();
+  void Run() noexcept override;
 };
 
 #endif

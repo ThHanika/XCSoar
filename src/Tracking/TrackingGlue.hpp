@@ -83,7 +83,7 @@ class TrackingGlue final
   bool flying = false, last_flying;
 
 public:
-  explicit TrackingGlue(boost::asio::io_service &io_service);
+  explicit TrackingGlue(boost::asio::io_context &io_context);
 
   void StopAsync();
   void WaitStopped();
@@ -92,7 +92,7 @@ public:
   void OnTimer(const MoreData &basic, const DerivedInfo &calculated);
 
 protected:
-  void Tick() override;
+  void Tick() noexcept override;
 
 private:
   /* virtual methods from SkyLinesTracking::Handler */
@@ -104,7 +104,7 @@ private:
   void OnThermal(unsigned time_of_day_ms,
                  const AGeoPoint &bottom, const AGeoPoint &top,
                  double lift) override;
-  void OnSkyLinesError(const std::exception &e) override;
+  void OnSkyLinesError(std::exception_ptr e) override;
 
 public:
   const SkyLinesTracking::Data &GetSkyLinesData() const {

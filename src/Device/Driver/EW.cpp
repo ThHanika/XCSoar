@@ -90,7 +90,8 @@ EWDevice::TryConnect(OperationEnvironment &env)
     if (port.ExpectString("IO Mode.\r", env))
       return true;
 
-    if (!port.FullFlush(env, 100, 500))
+    if (!port.FullFlush(env, std::chrono::milliseconds(100),
+                        std::chrono::milliseconds(500)))
       return false;
   }
 
@@ -129,7 +130,7 @@ EWDevice::DeclareInner(const struct Declaration &declaration,
 
   // send SetPilotInfo
   WriteWithChecksum(port, "#SPI");
-  env.Sleep(50);
+  env.Sleep(std::chrono::milliseconds(50));
 
   char sPilot[13], sGliderType[9], sGliderID[9];
   convert_string(sPilot, sizeof(sPilot), declaration.pilot_name);

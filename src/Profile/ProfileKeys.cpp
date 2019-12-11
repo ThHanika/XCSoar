@@ -131,6 +131,7 @@ const char AppInfoBoxColors[] = "AppInfoBoxColors";
 const char TeamcodeRefWaypoint[] = "TeamcodeRefWaypoint";
 const char AppInfoBoxBorder[] = "AppInfoBoxBorder";
 const char ShowMenuButton[] = "ShowMenuButton";
+const char CursorSize[] = "CursorSize";
 
 const char AppAveNeedle[] = "AppAveNeedle";
 
@@ -240,6 +241,7 @@ const char SkyLinesRoaming[] = "SkyLinesRoaming";
 const char SkyLinesTrackingInterval[] = "SkyLinesTrackingInterval";
 const char SkyLinesTrafficEnabled[] = "SkyLinesTrafficEnabled";
 const char SkyLinesNearTrafficEnabled[] = "SkyLinesNearTrafficEnabled";
+const char SkyLinesTrafficMapMode[] = "SkyLinesTrafficMapMode";
 const char SkyLinesTrackingKey[] = "SkyLinesTrackingKey";
 
 const char CloudEnabled[] = "CloudEnabled";
@@ -261,6 +263,10 @@ const char PCMetFtpPassword[] = "PCMetFtpPassword";
 
 const char EnableLocationMapItem[] = "EnableLocationMapItem";
 const char EnableArrivalAltitudeMapItem[] = "EnableArrivalAltitudeMapItem";
+const char EnableAirspaceMapItem[] = "EnableAirspaceMapItem";
+const char EnableTrafficMapItem[] = "EnableTrafficMapItem";
+const char RangeOfNearestMapItemsInPercent[] = "RangeOfNearestMapItemsInPercent";
+const char RangefilterAllWaypointUpToKm[] = "RangefilterAllWaypointUpToKm";
 
 const char VarioMinFrequency[] = "VarioMinFrequency";
 const char VarioZeroFrequency[] = "VarioZeroFrequency";

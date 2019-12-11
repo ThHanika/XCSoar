@@ -25,7 +25,7 @@ Copyright_License {
 #include "Message.hpp"
 #include "NMEA/Info.hpp"
 #include "NMEA/InputLine.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <tchar.h>
 #include <algorithm>
@@ -121,9 +121,10 @@ VegaDevice::PDVSC(NMEAInputLine &line, gcc_unused NMEAInfo &info)
   if (StringIsEqual(name, "ToneDeadbandCirclingLow"))
     value = std::max(value, -value);
 
-  settings.Lock();
-  settings.Set(name, value);
-  settings.Unlock();
+  {
+    const std::lock_guard<Mutex> lock(settings);
+    settings.Set(name, value);
+  }
 
   return true;
 }

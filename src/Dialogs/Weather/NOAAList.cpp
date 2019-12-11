@@ -43,7 +43,7 @@ Copyright_License {
 #include "Weather/NOAAUpdater.hpp"
 #include "Util/TrivialArray.hxx"
 #include "Util/StringAPI.hxx"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Renderer/NOAAListRenderer.hpp"
 #include "Renderer/TwoTextRowsRenderer.hpp"
 
@@ -110,7 +110,7 @@ protected:
 
 private:
   /* virtual methods from class ActionListener */
-  virtual void OnAction(int id) override;
+  void OnAction(int id) noexcept override;
 };
 
 void
@@ -256,7 +256,7 @@ NOAAListWidget::OnActivateItem(unsigned index)
 }
 
 void
-NOAAListWidget::OnAction(int id)
+NOAAListWidget::OnAction(int id) noexcept
 {
   switch ((Buttons)id) {
   case DETAILS:

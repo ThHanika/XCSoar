@@ -33,7 +33,7 @@ class WorkerThread : public SuspensibleThread {
   Cond trigger_cond;
   bool trigger_flag = false;
 
-  const unsigned period_min, idle_min, delay;
+  const std::chrono::steady_clock::duration period_min, idle_min, delay;
 
 public:
   /**
@@ -54,10 +54,10 @@ public:
    * Wakes up the thread to do work, calls tick().
    */
   void Trigger() {
-    const ScopeLock lock(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     if (!trigger_flag) {
       trigger_flag = true;
-      trigger_cond.signal();
+      trigger_cond.notify_one();
     }
   }
 
@@ -65,7 +65,7 @@ public:
    * Suspend execution until Resume() is called.
    */
   void BeginSuspend() {
-    const ScopeLock lock(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     _BeginSuspend();
   }
 
@@ -74,13 +74,13 @@ public:
    */
   void _BeginSuspend() {
     SuspensibleThread::_BeginSuspend();
-    trigger_cond.signal();
+    trigger_cond.notify_one();
   }
 
   void Suspend() {
-    const ScopeLock lock(mutex);
+    std::unique_lock<Mutex> lock(mutex);
     _BeginSuspend();
-    _WaitUntilSuspended();
+    _WaitUntilSuspended(lock);
   }
 
   /**
@@ -88,18 +88,18 @@ public:
    * synchronously for the thread to exit.
    */
   void BeginStop() {
-    const ScopeLock lock(mutex);
+    const std::lock_guard<Mutex> lock(mutex);
     SuspensibleThread::_BeginStop();
-    trigger_cond.signal();
+    trigger_cond.notify_one();
   }
 
 protected:
-  virtual void Run();
+  virtual void Run() noexcept;
 
   /**
    * Implement this to do the actual work.
    */
-  virtual void Tick() = 0;
+  virtual void Tick() noexcept = 0;
 };
 
 #endif

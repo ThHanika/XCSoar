@@ -25,9 +25,9 @@ Copyright_License {
 #define XCSOAR_TRACKING_SKYLINES_TRAFFIC_HPP
 
 #include "Geo/GeoPoint.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Util/tstring.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <map>
 #include <list>

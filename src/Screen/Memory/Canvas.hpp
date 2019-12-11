@@ -33,11 +33,11 @@ Copyright_License {
 #include "PixelTraits.hpp"
 #include "Buffer.hpp"
 #include "ActivePixelTraits.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <tchar.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 /* those are WIN32 macros - undefine, or Canvas::background_mode will
    break */
 #undef OPAQUE

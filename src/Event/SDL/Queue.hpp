@@ -26,17 +26,17 @@ Copyright_License {
 
 #include "Loop.hpp"
 #include "../Shared/TimerQueue.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
+#include "Time/ClockCache.hxx"
 
 #include <SDL_events.h>
+
+#include <chrono>
 
 class Window;
 
 class EventQueue {
-  /**
-   * The current time after the event thread returned from sleeping.
-   */
-  uint64_t now_us;
+  ClockCache<std::chrono::steady_clock> steady_clock_cache;
 
   Mutex mutex;
   TimerQueue timers;
@@ -47,12 +47,14 @@ public:
   EventQueue();
 
   /**
-   * Returns the monotonic clock in microseconds.  This method is only
-   * available in the main thread.
+   * Caching wrapper for std::chrono::steady_clock::now().  The
+   * real clock is queried at most once per event loop
+   * iteration, because it is assumed that the event loop runs
+   * for a negligible duration.
    */
   gcc_pure
-  uint64_t ClockUS() const {
-    return now_us;
+  const auto &SteadyNow() const noexcept {
+    return steady_clock_cache.now();
   }
 
   bool IsQuit() const {
@@ -88,8 +90,13 @@ public:
    */
   void Purge(Window &window);
 
-  void AddTimer(Timer &timer, unsigned ms);
+  void AddTimer(Timer &timer, std::chrono::steady_clock::duration d) noexcept;
   void CancelTimer(Timer &timer);
+
+private:
+  void FlushClockCaches() noexcept {
+    steady_clock_cache.flush();
+  }
 };
 
 #endif

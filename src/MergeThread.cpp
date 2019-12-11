@@ -57,7 +57,7 @@ MergeThread::Process()
 }
 
 void
-MergeThread::Tick()
+MergeThread::Tick() noexcept
 {
   bool gps_updated, calculated_updated;
 
@@ -67,7 +67,7 @@ MergeThread::Tick()
 #endif
 
   {
-    ScopeLock protect(device_blackboard.mutex);
+    std::lock_guard<Mutex> lock(device_blackboard.mutex);
 
     Process();
 

@@ -25,14 +25,14 @@ Copyright_License {
 #define XCSOAR_FLARM_ERROR_HPP
 
 #include "NMEA/Validity.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <type_traits>
 
 #include <stdint.h>
 #include <tchar.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #undef NO_ERROR
 #endif
 

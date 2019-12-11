@@ -16,7 +16,7 @@ else
   ANDROID_SDK ?= $(HOME)/opt/android-sdk-linux
 endif
 ANDROID_SDK_PLATFORM_DIR = $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)
-ANDROID_ABI_DIR = $(ANDROID_BUILD)/lib/$(ANDROID_ABI5)
+ANDROID_ABI_DIR = $(ANDROID_BUILD)/lib/$(ANDROID_APK_LIB_ABI)
 
 JAVA_CLASSFILES_DIR = $(ABI_BIN_DIR)/bin/classes
 
@@ -46,6 +46,7 @@ NATIVE_CLASSES := \
 	NativeInputListener \
 	DownloadUtil \
 	BatteryReceiver \
+	GliderLinkReceiver \
 	NativePortListener \
 	NativeLeScanCallback \
 	NativeBMP085Listener \
@@ -245,6 +246,7 @@ $(call SRC_TO_OBJ,$(SRC)/Android/Main.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/EventBridge.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/InternalSensors.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/Battery.cpp): $(NATIVE_HEADERS)
+$(call SRC_TO_OBJ,$(SRC)/Android/GliderLink.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativePortListener.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeLeScanCallback.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeInputListener.cpp): $(NATIVE_HEADERS)

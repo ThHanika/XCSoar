@@ -70,6 +70,12 @@ enum class FinalGlideBarDisplayMode: uint8_t {
   AUTO,
 };
 
+enum class DisplaySkyLinesTrafficMapMode: uint8_t {
+  OFF,
+  SYMBOL,
+  SYMBOL_NAME,
+};
+
 struct MapItemListSettings {
 
   /** Add an LocationMapItem to the MapItemList? */
@@ -77,6 +83,18 @@ struct MapItemListSettings {
 
   /** Add an ArrivalAltitudeMapItem to the MapItemList? */
   bool add_arrival_altitude;
+
+  /** Add an Airspace to the MapItemList? */
+  bool add_airspace;
+
+  /** Add flarm-traffic to the MapItemList? */
+  bool add_traffic;
+
+  /* nearest map items: the range is a circle calculate in % of the smallest side of the display */
+  unsigned int range_of_nearest_map_items_in_percent_of_displaysize;
+
+  /* nearest map items: range-filter in km for only landable waypoints  0km only landable */
+  unsigned int rangefilter_all_waypoint_up_to_km;
 
   void SetDefaults();
 };
@@ -186,6 +204,11 @@ struct MapSettings {
    * Overlay FAI triangle areas on the map while flying?
    */
   bool show_fai_triangle_areas;
+
+  /**
+   * Display skylines name on map
+   */
+  DisplaySkyLinesTrafficMapMode skylines_traffic_map_mode;
 
   FAITriangleSettings fai_triangle_settings;
 

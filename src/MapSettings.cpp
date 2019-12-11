@@ -28,6 +28,10 @@ MapItemListSettings::SetDefaults()
 {
   add_location = true;
   add_arrival_altitude = true;
+  add_airspace = true;
+  add_traffic = true;
+  range_of_nearest_map_items_in_percent_of_displaysize = 0; // 0% default behavior
+  rangefilter_all_waypoint_up_to_km = 100; // list waypoints with max 100km distance from hitpoint
 }
 
 void
@@ -66,6 +70,7 @@ MapSettings::SetDefaults()
   final_glide_bar_display_mode = FinalGlideBarDisplayMode::ON;
   vario_bar_enabled = false;
   show_fai_triangle_areas = false;
+  skylines_traffic_map_mode = DisplaySkyLinesTrafficMapMode::SYMBOL;
 
   trail.SetDefaults();
   item_list.SetDefaults();

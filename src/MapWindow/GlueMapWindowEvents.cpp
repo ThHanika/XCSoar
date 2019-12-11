@@ -28,7 +28,7 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Math/FastMath.hpp"
-#include "Compiler.h"
+#include "Util/Compiler.h"
 #include "Interface.hpp"
 #include "Pan.hpp"
 #include "Util/Clamp.hpp"
@@ -86,7 +86,7 @@ GlueMapWindow::OnMouseMove(PixelPoint p, unsigned keys)
   const unsigned threshold = Layout::Scale(IsEmbedded() ? 50 : 10);
   if (drag_mode != DRAG_NONE && arm_mapitem_list &&
       ((unsigned)ManhattanDistance(drag_start, p) > threshold ||
-       mouse_down_clock.Elapsed() > 200))
+       mouse_down_clock.Elapsed() > std::chrono::milliseconds(200)))
     arm_mapitem_list = false;
 
   switch (drag_mode) {
@@ -219,7 +219,7 @@ GlueMapWindow::OnMouseUp(PixelPoint p)
     return true;
   }
 
-  int click_time = mouse_down_clock.Elapsed();
+  const auto click_time = mouse_down_clock.Elapsed();
   mouse_down_clock.Reset();
 
   DragMode old_drag_mode = drag_mode;
@@ -247,12 +247,12 @@ GlueMapWindow::OnMouseUp(PixelPoint p)
 #ifdef ENABLE_OPENGL
     kinetic_x.MouseUp(p.x);
     kinetic_y.MouseUp(p.y);
-    kinetic_timer.Schedule(30);
+    kinetic_timer.Schedule(std::chrono::milliseconds(30));
 #endif
     break;
 
   case DRAG_SIMULATOR:
-    if (click_time > 50 &&
+    if (click_time > std::chrono::milliseconds(50) &&
         compare_squared(drag_start.x - p.x, drag_start.y - p.y,
                         Layout::Scale(36)) == 1) {
       GeoPoint location = visible_projection.ScreenToGeo(p);
@@ -287,7 +287,7 @@ GlueMapWindow::OnMouseUp(PixelPoint p)
   }
 
   if (arm_mapitem_list) {
-    map_item_timer.Schedule(200);
+    map_item_timer.Schedule(std::chrono::milliseconds(200));
     return true;
   }
 

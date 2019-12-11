@@ -34,11 +34,10 @@
 #include "Android/LeScanCallback.hpp"
 #include "Android/BluetoothHelper.hpp"
 #include "Language/Language.hpp"
-#include "Thread/Mutex.hpp"
+#include "Thread/Mutex.hxx"
 #include "Event/Notify.hpp"
 #include "Util/StringCompare.hxx"
 
-#include <string>
 #include <vector>
 #include <forward_list>
 #include <set>
@@ -69,8 +68,8 @@ public:
     :dialog(_dialog) {}
 
   gcc_pure
-  const char *GetSelectedAddress() const {
-    return items[GetList().GetCursorIndex()].address.c_str();
+  const auto &GetSelectedAddress() const {
+    return items[GetList().GetCursorIndex()].address;
   }
 
   void CreateButtons() {
@@ -111,7 +110,7 @@ private:
     }
 
     {
-      const ScopeLock protect(mutex);
+      const std::lock_guard<Mutex> lock(mutex);
       new_items.emplace_front(address, name);
     }
 
@@ -123,7 +122,7 @@ private:
     const bool was_empty = items.empty();
 
     {
-      const ScopeLock protect(mutex);
+      const std::lock_guard<Mutex> lock(mutex);
 
       if (new_items.empty())
         return;
@@ -178,8 +177,8 @@ ScanBluetoothLeWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   canvas.DrawText(rc.left + margin, rc.top + margin, name);
 }
 
-bool
-ScanBluetoothLeDialog(char *address, size_t address_size)
+std::string
+ScanBluetoothLeDialog() noexcept
 {
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   ScanBluetoothLeWidget widget(dialog);
@@ -190,7 +189,7 @@ ScanBluetoothLeDialog(char *address, size_t address_size)
     const TCHAR *message =
       _("Bluetooth LE is not available on this device.");
     ShowMessageBox(message, _("Bluetooth LE"), MB_OK);
-    return false;
+    return {};
   }
 
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Bluetooth LE"), &widget);
@@ -203,8 +202,7 @@ ScanBluetoothLeDialog(char *address, size_t address_size)
   dialog.StealWidget();
 
   if (result != mrOK)
-    return false;
+    return {};
 
-  CopyString(address, widget.GetSelectedAddress(), address_size);
-  return true;
+  return widget.GetSelectedAddress();
 }

@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_INPUT_EVENTS_HPP
 #define XCSOAR_INPUT_EVENTS_HPP
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 #include <tchar.h>
 
@@ -182,7 +182,7 @@ namespace InputEvents
   void eventFileManager(const TCHAR *misc);
   void eventRunLuaFile(const TCHAR *misc);
   void eventResetTask(const TCHAR *misc);
-
+  void eventLockScreen(const TCHAR *misc);
   // -------
 };
 

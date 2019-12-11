@@ -1,5 +1,8 @@
 /*
- * Copyright (C) 2009-2015 Max Kellermann <max.kellermann@gmail.com>
+ * Copyright 2007-2018 Content Management AG
+ * All rights reserved.
+ *
+ * author: Max Kellermann <mk@cm4all.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,51 +30,27 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_THREAD_FAST_SHARED_MUTEX_HXX
-#define XCSOAR_THREAD_FAST_SHARED_MUTEX_HXX
+#pragma once
 
-#ifdef WIN32
+#include <chrono>
 
-#include "WindowsSharedMutex.hxx"
-using FastSharedMutex = WindowsSharedMutex;
-
-#else
-
-#include "PosixSharedMutex.hxx"
-using FastSharedMutex = PosixSharedMutex;
-
-#endif
-
-class ScopeExclusiveLock {
-  FastSharedMutex &mutex;
+/**
+ * Cache the now() method of a clock.
+ */
+template<typename Clock>
+class ClockCache {
+	using value_type = typename Clock::time_point;
+	mutable value_type value = {};
 
 public:
-  ScopeExclusiveLock(FastSharedMutex &_mutex):mutex(_mutex) {
-    mutex.lock();
-  };
+	gcc_pure
+	const auto &now() const noexcept {
+		if (value <= value_type())
+			value = Clock::now();
+		return value;
+	}
 
-  ~ScopeExclusiveLock() {
-    mutex.unlock();
-  }
-
-  ScopeExclusiveLock(const ScopeExclusiveLock &other) = delete;
-  ScopeExclusiveLock &operator=(const ScopeExclusiveLock &other) = delete;
+	void flush() noexcept {
+		value = {};
+	}
 };
-
-class ScopeSharedLock {
-  FastSharedMutex &mutex;
-
-public:
-  ScopeSharedLock(FastSharedMutex &_mutex):mutex(_mutex) {
-    mutex.lock_shared();
-  };
-
-  ~ScopeSharedLock() {
-    mutex.unlock_shared();
-  }
-
-  ScopeSharedLock(const ScopeSharedLock &other) = delete;
-  ScopeSharedLock &operator=(const ScopeSharedLock &other) = delete;
-};
-
-#endif

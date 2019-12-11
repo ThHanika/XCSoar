@@ -29,7 +29,7 @@ Copyright_License {
 #include "Profile/ProfileMap.hpp"
 // IWYU pragma: end_exports
 
-#include "Compiler.h"
+#include "Util/Compiler.h"
 
 class Path;
 class AllocatedPath;
@@ -53,8 +53,10 @@ namespace Profile
 
   /**
    * Saves the profile into the profile files
+   *
+   * Errors will be caught and logged.
    */
-  void Save();
+  void Save() noexcept;
   /**
    * Saves the profile into the given profile file
    */

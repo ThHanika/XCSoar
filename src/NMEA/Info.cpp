@@ -26,31 +26,6 @@ Copyright_License {
 #include "Atmosphere/AirDensity.hpp"
 
 void
-GPSState::Reset()
-{
-  fix_quality = FixQuality::NO_FIX;
-  fix_quality_available.Clear();
-  real = false;
-  simulator = false;
-#if defined(ANDROID) || defined(__APPLE__)
-  nonexpiring_internal_gps = false;
-#endif
-  satellites_used_available.Clear();
-  satellite_ids_available.Clear();
-  replay = false;
-}
-
-void
-GPSState::Expire(double now)
-{
-  if (fix_quality_available.Expire(now, 5))
-    fix_quality = FixQuality::NO_FIX;
-
-  satellites_used_available.Expire(now, 5);
-  satellite_ids_available.Expire(now, 60);
-}
-
-void
 NMEAInfo::UpdateClock()
 {
   clock = MonotonicClockFloat();
@@ -221,43 +196,52 @@ NMEAInfo::ExpireWallClock()
     return;
 #endif
 
-  alive.Expire(clock, 10);
+  alive.Expire(clock, std::chrono::seconds(10));
   if (!alive) {
     time_available.Clear();
     gps.Reset();
     flarm.Clear();
   } else {
-    time_available.Expire(clock, 10);
+    time_available.Expire(clock, std::chrono::seconds(10));
   }
 }
 
 void
 NMEAInfo::Expire()
 {
-  location_available.Expire(clock, 10);
-  track_available.Expire(clock, 10);
-  ground_speed_available.Expire(clock, 10);
+  if (location_available.Expire(clock, std::chrono::seconds(10)))
+    /* if the location expires, then GPSState should expire as well,
+       because all GPSState does is provide metadata for the GPS
+       fix */
+    gps.Reset();
+  else
+    gps.Expire(clock);
 
-  if (airspeed_available.Expire(clock, 30))
+  track_available.Expire(clock, std::chrono::seconds(10));
+  ground_speed_available.Expire(clock, std::chrono::seconds(10));
+
+  if (airspeed_available.Expire(clock, std::chrono::seconds(30)))
     airspeed_real = false;
 
-  gps_altitude_available.Expire(clock, 30);
-  static_pressure_available.Expire(clock, 30);
-  dyn_pressure_available.Expire(clock, 30);
-  pitot_pressure_available.Expire(clock, 30);
-  sensor_calibration_available.Expire(clock, 3600);
-  baro_altitude_available.Expire(clock, 30);
-  pressure_altitude_available.Expire(clock, 30);
-  noncomp_vario_available.Expire(clock, 5);
-  total_energy_vario_available.Expire(clock, 5);
-  netto_vario_available.Expire(clock, 5);
+  gps_altitude_available.Expire(clock, std::chrono::seconds(30));
+  static_pressure_available.Expire(clock, std::chrono::seconds(30));
+  dyn_pressure_available.Expire(clock, std::chrono::seconds(30));
+  pitot_pressure_available.Expire(clock, std::chrono::seconds(30));
+  sensor_calibration_available.Expire(clock, std::chrono::hours(1));
+  baro_altitude_available.Expire(clock, std::chrono::seconds(30));
+  pressure_altitude_available.Expire(clock, std::chrono::seconds(30));
+  noncomp_vario_available.Expire(clock, std::chrono::seconds(5));
+  total_energy_vario_available.Expire(clock, std::chrono::seconds(5));
+  netto_vario_available.Expire(clock, std::chrono::seconds(5));
   settings.Expire(clock);
-  external_wind_available.Expire(clock, 600);
-  engine_noise_level_available.Expire(clock, 30);
-  voltage_available.Expire(clock, 300);
-  battery_level_available.Expire(clock, 300);
+  external_wind_available.Expire(clock, std::chrono::minutes(10));
+  engine_noise_level_available.Expire(clock, std::chrono::seconds(30));
+  voltage_available.Expire(clock, std::chrono::minutes(5));
+  battery_level_available.Expire(clock, std::chrono::minutes(5));
   flarm.Expire(clock);
-  gps.Expire(clock);
+#ifdef ANDROID
+  glink_data.Expire(clock);
+#endif
   attitude.Expire(clock);
 }
 
@@ -372,4 +356,8 @@ NMEAInfo::Complement(const NMEAInfo &add)
     stall_ratio = add.stall_ratio;
 
   flarm.Complement(add.flarm);
+
+#ifdef ANDROID
+  glink_data.Complement(add.glink_data);
+#endif
 }

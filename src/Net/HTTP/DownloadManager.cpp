@@ -157,17 +157,17 @@ public:
      current_size(-1), current_position(-1) {}
 
   void StopAsync() {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     StandbyThread::StopAsync();
   }
 
   void WaitStopped() {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     StandbyThread::WaitStopped();
   }
 
   void AddListener(Net::DownloadListener &listener) {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
 
     assert(std::find(listeners.begin(), listeners.end(),
                      &listener) == listeners.end());
@@ -176,7 +176,7 @@ public:
   }
 
   void RemoveListener(Net::DownloadListener &listener) {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
 
     auto i = std::find(listeners.begin(), listeners.end(), &listener);
     assert(i != listeners.end());
@@ -184,7 +184,7 @@ public:
   }
 
   void Enumerate(Net::DownloadListener &listener) {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
 
     for (auto i = queue.begin(), end = queue.end(); i != end; ++i) {
       const Item &item = *i;
@@ -200,7 +200,7 @@ public:
   }
 
   void Enqueue(const char *uri, Path path_relative) {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     queue.emplace_back(uri, path_relative);
 
     for (auto *listener : listeners)
@@ -211,7 +211,7 @@ public:
   }
 
   void Cancel(Path relative_path) {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
 
     auto i = std::find(queue.begin(), queue.end(), relative_path);
     if (i == queue.end())
@@ -242,22 +242,22 @@ private:
 
 protected:
   /* methods from class StandbyThread */
-  void Tick() override;
+  void Tick() noexcept override;
 
 private:
   /* methods from class OperationEnvironment */
   bool IsCancelled() const override {
-    ScopeLock protect(const_cast<Mutex &>(mutex));
+    std::lock_guard<Mutex> lock(const_cast<Mutex &>(mutex));
     return StandbyThread::IsStopped();
   }
 
   void SetProgressRange(unsigned range) override {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     current_size = range;
   }
 
   void SetProgressPosition(unsigned position) override {
-    ScopeLock protect(mutex);
+    std::lock_guard<Mutex> lock(mutex);
     current_position = position;
   }
 };
@@ -289,8 +289,8 @@ DownloadManagerThread::ProcessQueue(Net::Session &session)
       success = DownloadToFileTransaction(session, item.uri.c_str(),
                                           LocalPath(item.path_relative.c_str()),
                                           nullptr, *this);
-    } catch (const std::exception &exception) {
-      LogError(exception);
+    } catch (...) {
+      LogError(std::current_exception());
     }
 
     current_size = current_position = -1;
@@ -315,13 +315,13 @@ DownloadManagerThread::FailQueue()
 }
 
 void
-DownloadManagerThread::Tick()
+DownloadManagerThread::Tick() noexcept
 {
   try {
     Net::Session session;
     ProcessQueue(session);
-  } catch (const std::exception &exception) {
-    LogError(exception);
+  } catch (...) {
+    LogError(std::current_exception());
     FailQueue();
   }
 }
